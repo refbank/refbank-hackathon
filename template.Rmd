@@ -1,0 +1,73 @@
+---
+title: "Template"
+output:
+  html_document:
+    toc: true
+    df_print: paged
+---
+
+Copy me!
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F)
+library(tidyverse)
+library(here)
+library(ggplot2)
+library(stringi)
+
+theme_set(theme_bw())
+
+source(here("data_helpers.R"))
+DATA_LOC=here("harmonized_data")
+```
+
+
+# Get data
+
+```{r, eval=F}
+
+# options to get trials / choices / messages for all datasets
+all_dirs <- list.dirs(DATA_LOC, full.names = FALSE) |> 
+  stri_remove_empty()
+
+all_messages <- map(all_dirs, \(d) get_messages_full(DATA_LOC, d)) |> 
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_choices <- map(all_dirs, \(d) get_choices_full(DATA_LOC, d)) |>
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_trials <- map(all_dirs, \(d) get_trials_full(DATA_LOC, d)) |>
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+```
+
+```{r, eval=F}
+
+# alternatively can get individual tables / experiments 
+
+dataset="hawkins2021_respect"
+
+single_table <- get_tbl(dataset_name=dataset, tbl_name = "conditions") 
+#options are conditions, trials, messages, choices
+
+# get trials + conditions
+full_trials <- get_trials_full(dataset_name=dataset)
+
+# get messages + trials + conditions
+full_messages <- get_messages_full(dataset_name=dataset)
+
+# get choices + trials + conditions
+full_choices <- get_choices_full(dataset_name=dataset)
+```
+
