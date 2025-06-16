@@ -1,12 +1,10 @@
 ---
-title: "Template"
+title: "Merge data and export"
 output:
   html_document:
     toc: true
     df_print: paged
 ---
-
-Copy me!
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = F, message = F)
@@ -23,6 +21,8 @@ DATA_LOC=here("harmonized_data")
 
 
 # Get data
+
+Mark with dataset IDs
 
 ```{r, eval=F}
 # options to get trials / choices / messages for all datasets
@@ -55,6 +55,8 @@ all_trials <- map(datasets, \(d) get_trials_full(DATA_LOC, d) |>
 
 all_datasets <- tibble(dataset_id = datasets)
 ```
+
+Write out for redivis with missing for NA to facilitate import. 
 
 ```{r}
 write_csv(all_datasets, here("merged_data", "datasets.csv"), na = "")
