@@ -25,6 +25,7 @@ DATA_LOC=here("harmonized_data")
 # Get data
 
 ```{r, eval=F}
+STAGE_ONE_ONLY = TRUE # change this to include subsequent stages as well, for multi-stage datasets
 
 # options to get trials / choices / messages for all datasets
 all_dirs <- list.dirs(DATA_LOC, full.names = FALSE) |> 
@@ -50,6 +51,15 @@ all_trials <- map(all_dirs, \(d) get_trials_full(DATA_LOC, d)) |>
            str_split(";") |> 
            lengths()) |> 
   filter(option_size != 1)
+
+if (STAGE_ONE_ONLY) {
+  all_trials <- all_trials |> 
+    filter(stage_num == 1)
+  all_choices <- all_choices |> 
+    filter(stage_num == 1)
+  all_messages <- all_messages |> 
+    filter(stage_num == 1)
+}
 ```
 
 ```{r, eval=F}
