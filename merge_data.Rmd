@@ -1,0 +1,65 @@
+---
+title: "Template"
+output:
+  html_document:
+    toc: true
+    df_print: paged
+---
+
+Copy me!
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F)
+library(tidyverse)
+library(here)
+library(ggplot2)
+library(stringi)
+
+theme_set(theme_bw())
+
+source(here("data_helpers.R"))
+DATA_LOC=here("harmonized_data")
+```
+
+
+# Get data
+
+```{r, eval=F}
+# options to get trials / choices / messages for all datasets
+datasets <- list.dirs(DATA_LOC, full.names = FALSE) |> 
+  stri_remove_empty()
+
+all_messages <- map(datasets, \(d) get_messages_full(DATA_LOC, d) |>
+                      mutate(dataset_id = d)) |> 
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_choices <- map(datasets, \(d) get_choices_full(DATA_LOC, d) |>
+                      mutate(dataset_id = d)) |>
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_trials <- map(datasets, \(d) get_trials_full(DATA_LOC, d) |>
+                      mutate(dataset_id = d)) |>
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_datasets <- tibble(dataset_id = datasets)
+```
+
+```{r}
+write_csv(all_datasets, here("merged_data", "datasets.csv"), na = "")
+write_csv(all_messages, here("merged_data", "messages.csv"), na = "")
+write_csv(all_choices,  here("merged_data", "choices.csv"), na = "")
+write_csv(all_messages, here("merged_data", "trials.csv"), na = "")
+```
+
