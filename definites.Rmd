@@ -121,26 +121,30 @@ df.describer_messages_tagged <- df.all_describer_messages_parsed %>%
             join_by(doc_id))
 
 # Check for weird things 
-counts <- df.result %>%
+counts <- df.describer_messages_tagged %>%
   rowwise() %>% 
   mutate(true_count = sum(V_first, the_first, indef_first, bare_noun_first)) 
 
 # 0 coded as simultaneously indef and def, or verb and def
 counts %>% 
     filter(true_count> 1) %>% nrow()
-# 0 get NA 
+# 7 get NA 
 counts %>% 
     filter(is.na(true_count)) %>% nrow()
 
 # 34089 coded as none (about 1/3 of all describer sentences)
 counts %>% 
     filter(true_count< 1) %>% nrow()
+
+
+df.describer_messages_tagged<- df.describer_messages_tagged %>% 
+  filter(!is.na(V_first))
   
 ```
 
 # Plotting 
 ```{r}
-df.agr <- df.result %>% 
+df.agr <- df.describer_messages_tagged %>% 
   select(rep_num, text, V_first, the_first, indef_first, bare_noun_first) %>% 
   pivot_longer(cols = c(V_first, the_first, indef_first, bare_noun_first),
                names_to = "first_type",
@@ -157,7 +161,7 @@ df.agr %>%
 
 ```{r}
 
-proportions <- df.result %>% 
+proportions <- df.describer_messages_tagged %>% 
   group_by(rep_num) %>%
   summarise(
     total_rows = n(),
