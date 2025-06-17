@@ -1,0 +1,212 @@
+---
+title: "Template"
+output:
+  html_document:
+    toc: true
+    df_print: paged
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F)
+library(tidyverse)
+library(here)
+library(ggplot2)
+library(stringi)
+
+theme_set(theme_bw())
+
+source(here("data_helpers.R"))
+DATA_LOC=here("harmonized_data")
+```
+
+
+# Get data
+
+```{r, eval=F}
+STAGE_ONE_ONLY = FALSE # change this to include subsequent stages as well, for multi-stage datasets
+
+# options to get trials / choices / messages for all datasets
+all_dirs <- list.dirs(DATA_LOC, full.names = FALSE) |> 
+  stri_remove_empty()
+
+all_messages <- map(all_dirs, \(d) get_messages_full(DATA_LOC, d)) |> 
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_choices <- map(all_dirs, \(d) get_choices_full(DATA_LOC, d)) |>
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_trials <- map(all_dirs, \(d) get_trials_full(DATA_LOC, d)) |>
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+if (STAGE_ONE_ONLY) {
+  all_trials <- all_trials |> 
+    filter(stage_num == 1)
+  all_choices <- all_choices |> 
+    filter(stage_num == 1)
+  all_messages <- all_messages |> 
+    filter(stage_num == 1)
+}
+```
+
+```{r, eval=F}
+
+# alternatively can get individual tables / experiments 
+
+dataset="hawkins2021_respect"
+
+single_table <- get_tbl(dataset_name=dataset, tbl_name = "conditions") 
+#options are conditions, trials, messages, choices
+
+# get trials + conditions
+full_trials <- get_trials_full(dataset_name=dataset)
+
+# get messages + trials + conditions
+full_messages <- get_messages_full(dataset_name=dataset)
+
+# get choices + trials + conditions
+full_choices <- get_choices_full(dataset_name=dataset)
+```
+
+# Try 1 
+
+```{r}
+
+clean_up_text <- function(text){
+  text |> str_to_lower() |> str_remove_all("[^a-z ]") |> str_squish()
+}
+
+end <- all_messages |> 
+  group_by(condition_label) |> 
+  filter(rep_num==max(rep_num)) |> 
+  filter(role=="describer") |> 
+  group_by(game_id, target, rep_num, condition_label) |> 
+  summarize(convention=str_c(text, sep=" ", collapse=" ")) |> 
+  mutate(convention=clean_up_text(convention)) |> 
+  filter(!convention=="") |> 
+  ungroup() |> 
+  select(game_id, target, convention, condition_label)
+  
+```
+
+```{r}
+earlier <- all_messages |> 
+  group_by(condition_label) |> 
+  select(game_id, option_set, target, stage_num, rep_num, trial_num, condition_label, paper_id, role, text) |> 
+  mutate(text=clean_up_text(text)) |> 
+  left_join(end) |> 
+  mutate(base_regex = str_detect(text, convention) |> as.numeric()) |> 
+  rowwise() |> 
+  mutate(
+        fuzzy_regex = agrepl(convention, text))
+
+earlier_concat <- all_messages |> 
+  group_by(condition_label) |> 
+  select(game_id, option_set, player_id, target, stage_num, rep_num, trial_num, condition_label, paper_id, role, text) |> 
+group_by(game_id, option_set, player_id, target, stage_num, rep_num, trial_num, condition_label, paper_id, role) |>  
+  summarize(text=str_c(text, sep=" ", collapse=" ")) |> 
+              mutate(text=clean_up_text(text)) |> 
+  left_join(end) |> 
+  mutate(base_regex = str_detect(text, convention) |> as.numeric()) |> 
+  rowwise() |> 
+  mutate(fuzzy_regex=agrepl(convention, text))
+```
+
+
+```{r}
+# earlier |>
+#   ggplot(aes(x=rep_num, y=base_regex, color=condition_label))+
+#   geom_smooth(method="glm", method.args = list(family="binomial"))
+
+
+earlier_concat |>filter(role=="describer") |> 
+  ggplot(aes(x=rep_num, y=base_regex, color=condition_label))+
+  coord_cartesian(ylim=c(0,1))+
+  geom_smooth(method="glm", method.args = list(family="binomial"))
+
+
+earlier_concat |>filter(role=="describer") |> 
+  group_by(condition_label) |> 
+  mutate(frac=rep_num/max(rep_num)) |> 
+  filter(paper_id!="yoon2019_audience") |> 
+  ggplot(aes(x=frac, y=base_regex, color=condition_label))+
+  coord_cartesian(ylim=c(0,1))+
+  stat_summary(aes(group=game_id), geom="point", alpha=.1, position=position_jitter(width=.1, height=.1))+
+  geom_smooth(method="glm", method.args = list(family="binomial"))
+
+# earlier_concat |>filter(role=="matcher") |> 
+#   group_by(condition_label) |> 
+#   mutate(frac=rep_num/max(rep_num)) |> 
+#   filter(paper_id!="yoon2019_audience") |> 
+#   ggplot(aes(x=frac, y=base_regex, color=condition_label))+
+#   coord_cartesian(ylim=c(0,1))+
+#   stat_summary(aes(group=game_id), geom="point", alpha=.1, position=position_jitter(width=.1, height=.1))+
+#   geom_smooth(method="glm", method.args = list(family="binomial"))
+```
+
+
+
+```{r}
+
+# earlier_concat |> filter(fuzzy_regex!=base_regex) |> View()
+
+# default setting on agrep seems mostly reasonable 
+
+
+
+earlier_concat |>filter(role=="describer") |> 
+  group_by(condition_label) |> 
+  mutate(frac=rep_num/max(rep_num)) |> 
+  filter(paper_id!="yoon2019_audience") |> 
+  ggplot(aes(x=frac, y=fuzzy_regex, color=condition_label))+
+  coord_cartesian(ylim=c(0,1))+
+  stat_summary(aes(group=game_id), geom="point", alpha=.1, position=position_jitter(width=.1, height=.1))+
+  geom_smooth(method="glm", method.args = list(family="binomial"))
+
+
+earlier_concat |>filter(role=="describer") |> 
+  group_by(condition_label) |> 
+  mutate(frac=rep_num/max(rep_num)) |> 
+  filter(paper_id!="yoon2019_audience") |> 
+  filter(target %in% c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L")) |> 
+  ggplot(aes(x=frac, y=fuzzy_regex, color=target))+
+  coord_cartesian(ylim=c(0,1))+
+  stat_summary(aes(group=str_c(condition_label, target)), geom="point", alpha=.1, position=position_jitter(width=.1, height=.1))+
+  geom_smooth(method="glm", method.args = list(family="binomial"))
+
+```
+
+TODO figure out survival curves!
+```{r, eval=F}
+cum <- earlier_concat |>filter(role=="describer") |> 
+  group_by(game_id, target) |> 
+  arrange(rep_num) |> 
+  filter(!is.na(base_regex)) |> 
+  mutate(cumsum_base_regex=cumsum(base_regex)) |> 
+  mutate(cum_base_regex=ifelse(cumsum_base_regex>0, 1, 0)) |> 
+  group_by(condition_label) |> 
+  mutate(frac=rep_num/max(rep_num)) |> 
+  filter(paper_id!="yoon2019_audience") 
+
+cum |> 
+  ggplot(aes(x=rep_num, y=cum_base_regex, color=condition_label))+
+  coord_cartesian(ylim=c(0,1))+
+  stat_summary(aes(group=game_id), geom="point", alpha=.1, position=position_jitter(width=.1, height=.1))+
+    stat_summary(aes(group=condition_label), geom="line", size=1)
+
+
+cum |> filter(rep_num==9) |> filter(condition_label=="pairs-network") |> View()
+```
+
