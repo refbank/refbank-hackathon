@@ -1,0 +1,283 @@
+user_message,label,model_choice
+"describer: standing guy pointing left
+",D,A
+"describer: praying one where they are kneeling down
+describer: no bent knee
+",K,B
+"matcher: hello?
+",B,Cannot determine yet.
+"describer: person in graduation outfit, holding a box
+",D,A
+"describer: target looks like an upright diamond placed on a cliff. straight left side, tapered on right side
+",J,B
+"describer: person walking to the left
+",A,A
+"describer: zig zag body
+",L,G
+"describer: zombie
+",A,A
+"describer: sleeper
+",F,F
+"describer: a man looking left with raised hands bringing a towel on them
+",D,B
+"matcher: skater is a good name
+describer: this one is standing with hands to the left. looks like a graduate
+",D,A
+"describer: i thought that was what this game was... ill keep that in ming
+describer: mind
+describer: this one has a bunny ear top, diamond face, and a declining financial forecast base
+matcher: it takes me a few but i can usually figure out which question to ask to get it.
+describer: so sitting with hands on knees almost
+matcher: bunny ears is great
+",E,C
+"describer: nodding out
+",F,B
+"describer: this one is flying and is drawn at an angle.
+",C,C
+"matcher: hello there
+describer: this character looks like they have a pack on their back while walking.
+",A,A
+"describer: what did that last one look like to you?
+matcher: i chose the wrong one...i see the one you were describing now
+describer: this one looks like a person standing and pointing to the left. kind of looks like they're dressed for a graduation. we'll call it graduate.
+describer: k cool.
+",D,A
+"describer: it looks like a rabbit
+",E,A
+"describer: two legs, one on ground
+",A,A
+"describer: ghost
+",C,H
+"describer: cocoon
+",H,H
+"describer: looks like a mouse
+",B,F
+"describer: person sitting on the ground
+",F,B
+"describer: target has head on opposite slope from his raised right leg
+describer: one leg on ground, one leg up
+",A,C
+"describer: last one!
+matcher: your clues were awesome - thank you!!!
+describer: 71 cent bonus, not too bad.
+describer: thanks :)
+matcher: :)
+describer: bunny ears
+",E,E
+"describer: one leg
+describer: standing on one leg
+describer: i'm trying full time
+matcher: head thrown back?
+describer: can't seem to earn more than about 15 a weeks
+describer: facing left
+describer: this one you asked if was standing on one leg
+",I,A
+"describer: side view, facing left, against wall
+",F,B
+"describer: large ears
+",E,A
+"describer: kneeling tilted head
+",B,B
+"describer: looks like a person balancing on one leg and sticking the other back
+matcher: is he leaning forwards?
+describer: like an ice skater spinning
+describer: yes
+",I,C
+"describer: choir boy
+",C,A
+"describer: leg raise on back right side
+",I,B
+"describer: snow angel
+",C,B
+"describer: blob
+",H,F
+"describer: sitting facing left
+",F,B
+"describer: squatting monk to the right
+",L,B
+"describer: square on head looks like a bird beak on left with a tail, you know you can ask questions
+matcher: what is the position of the body?
+describer: one leg down triangle tail 2 triangles on left that look like a beak and a diamond on top
+",I,A
+"matcher: i did the same thing when i described them!
+describer: first time for me; so bear with me.. now i have no idea what this is... buuutt.... it's got a diamond head, two points facing right and a stump on the left :p
+",K,L
+"describer: one leg up in the air, from behind
+",I,A
+"describer: diamond on a table
+",J,F
+"describer: resting against a tree
+",F,F
+"describer: lazy boy
+",F,B
+"describer: i may have to bail....i only have 20 minutes left on my timer
+describer: man with two arms outstretched
+matcher: alright, not sure what happens
+",C,A
+"describer: standing, with a robe -covered arm extended and a triangle head. looks like he is at a graduation.
+describer: we'll call him the graduate
+describer: left arm extended
+",D,A
+"describer: pear shaped with diamond
+",H,H
+"describer: side view, against wall facing left
+",F,F
+"describer: standing on one leg, body bent to left
+",I,A
+"describer: falling left arms up
+",C,B
+"describer: no arms guy
+",H,D
+"describer: protruding left. square right
+",D,B
+"describer: sitting down, legs not visible
+",D,D
+"describer: preacher standing straight
+",D,C
+"describer: rabbit looking right
+",E,A
+"describer: 90 degree angle dude
+matcher: thank you!
+",J,J
+"describer: blob
+",H,F
+"describer: bunny
+",E,A
+"describer: graduate at podium again. rear angle view.
+",D,A
+"describer: oops, other fatty blob
+matcher: ah, okay that one reminds me of a tombstone with a slight shadow, the last one
+matcher: maybe we can call that shadow tombstone if it comes up again or something?
+describer: right facing women with the parallelogram
+describer: sounds good
+",L,L
+"describer: balancing on leg, square on back
+",A,A
+"describer: the one where the image almost touches the left of the box
+",G,A
+"describer: diamond head sitting nothing sticking out
+",H,J
+"describer: bird head
+describer: with flag
+",A,A
+"describer: no idea what this one is.  it's the least human looking one of all, but not the other one we did with the square windmill on top of a hill
+matcher: hmm
+describer: i don't really know how to describe this one haha sorry...  looks like nothing
+describer: there is a square on top, with two triangles spaced farther apart on the right side
+matcher: anything sticking out on it?
+describer: the triangles are sticking out to the right
+",G,A
+"describer: we're not even halfway and your memory sucks, so guess, please guess
+describer: guess
+",G,A
+"describer: square and triangle at the top like falling off the right side
+",B,A
+"describer: squatting arms in front
+",L,B
+"describer: square on top fat shape on bottom
+",H,F
+"describer: dancer
+",G,B
+"describer: square tilts right, 2 triangles point towards it
+describer: triangle in bottom left corner
+",B,B
+"matcher: whoops
+describer: its all good
+describer: this one is the letter i
+",J,K
+"describer: sitting down, no limbs visible
+describer: no ears either
+matcher: facing right or left?
+describer: right
+",H,D
+"describer: idaho
+matcher: in my head he has a backpack btw
+",J,H
+"describer: bunny
+",E,A
+"matcher: i was scared to click after getting it wrong awhile ago.  ;)
+describer: walking facing left (box on back)
+describer: nan
+",A,B
+"describer: looking forward
+",H,B
+"describer: has two big points pointing to the right, almost two diamonds stacked on top of each other on the top side of the shape
+",K,F
+"describer: rabbit
+",E,A
+"describer: this one looks kind of like a rabbit
+",E,A
+"matcher: that was a tough one
+describer: left leaning ghost man
+describer: diamond head
+describer: like they are falling over
+describer: to the left
+",C,B
+"describer: guy resting against a tree.
+",F,B
+"describer: car seat
+matcher: that one looks like a statue
+matcher: lets call it statue
+",H,B
+"describer: man straight arms are west
+",D,A
+"describer: person squatting down, arm and knee point right
+matcher: diamond on back?
+describer: no
+",L,D
+"describer: left side is straight line top to bottom
+",J,D
+"describer: mturk hell is almost over
+matcher: hee
+matcher: lovely working with you
+describer: right carrying lady with the jutted out triangle
+",K,A
+"describer: shoulders down
+",H,A
+"describer: two right side triangles, trapezoid bottom left
+",G,F
+"describer: oh my bad sorry
+matcher: :)
+describer: praying with feet up
+",K,E
+"describer: standing sideways facing left, arms out holding a bowl, wearing a robe
+",D,B
+"describer: bunny ears
+",E,E
+"describer: pointing right flat botton square head
+",L,A
+"describer: oh we've seen this one before ... left sided vertical straight man (with the mini shoulder stump on the right)
+describer: stumped?
+matcher: hmm yeah kinda, head is on the left side, correct?
+describer: no no, just a straight side left side - perfectly flat
+matcher: ah got it i think
+",J,A
+"describer: man facing left, arm out
+",D,C
+"describer: guy kicking a ball has his right leg lifted high facing left
+",I,B
+"describer: kneeling with legs forming the vertical tail
+",K,B
+"describer: this will be dueling guy
+describer: its the guy with the weird big J shaped leg an the tiny triangle back foot on the right side
+matcher: standing on one leg
+describer: no
+describer: its the big fat J leg
+describer: not the normal sized leg
+",G,A
+"matcher: haha!
+describer: we got it!!!
+matcher: yep.
+describer: man carrying bowl facing left
+",D,F
+"describer: proposing
+",G,B
+"describer: candle
+describer: angled
+describer: boxy
+",J,A
+"describer: haha no worries you've been great! thanks for working with my weird descriptions
+describer: nun is back
+",L,A
+"describer: pointing to the right
+",L,C

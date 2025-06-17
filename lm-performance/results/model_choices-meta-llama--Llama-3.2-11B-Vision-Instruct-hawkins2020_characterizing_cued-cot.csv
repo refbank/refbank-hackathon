@@ -1,0 +1,255 @@
+user_message,label,model_choice
+"describer: like he is slouched against a wall facing the left
+",F,F
+"describer: leaning on my right
+",F,B
+"describer: chicken?
+describer: leg raised to left
+",A,I
+"describer: bunny sitting next to something looking down
+",E,J
+"describer: legs facing left, one foot in air
+",A,A
+"matcher: congrats and thank you
+describer: car dealership falling guy
+",C,
+"describer: bunny
+",E,K
+"describer: sad bunny
+",E,E
+"describer: 3 sides straight lines, bottom,top left, diamond on top
+",J,I
+"describer: same thing
+",I,K
+"describer: this looks like a native american with a headdress sitting down facing to the right. we'll call it native. two triangles on top of head, right triangle body.
+",E,K
+"describer: haha it's ok, if you're unsure, ill help jog the memory.
+describer: dumbo again.
+",A,D
+"describer: monk facing left
+describer: carrying something
+matcher: try to remember what you used before that is easier for me
+",D,
+"describer: this is the man leaning against the wall again
+",F,G
+"describer: bird pose, but sort of sitting
+",B,G
+"describer: d head, hand pointing right, no left hand
+",J,D
+"describer: woman reading, kneeling
+",K,F
+"describer: looks like a girl with a bow in her hair
+",E,J
+"describer: i'd like to read other peoples descriptions
+describer: idaho
+",J,
+"describer: pointing left
+",D,A
+"describer: the person is facing right with arms extended and almost kneeling.
+describer: legs are bent
+",L,K
+"describer: no arms
+",H,L
+"describer: looks like a person sitting down with knees bent, and square head leaving forward
+",F,F
+"describer: yoga pose
+",I,G
+"describer: s head, one foot facing right, one hand left, and triangle arm facing right
+",B,A
+"describer: ghost man
+",C,A
+"describer: facing east
+",D,K
+"describer: 2
+",F,B
+"describer: skate
+",I,L
+"describer: mouse
+",B,A
+"describer: choir singer
+",C,G
+"matcher: hello?
+",D,None of the images (A-L)
+"describer: kneel right flat back
+",H,F
+"matcher: crap!
+matcher: i'm really sorry!
+describer: standing on 1 leg both arms raised
+",A,
+"describer: head on a pedestal
+",J,I
+"describer: there's a box on top of a box. the body is really jagged
+describer: but there's two boxes the same size stacked on their corners
+",K,J
+"describer: duck shaped with diamond
+",K,K
+"describer: upside down bird
+",J,K
+"matcher: hello?
+",I,
+"describer: diamond guy
+",H,K
+"describer: new item square head
+",H,K
+"describer: shoulders and torso are going straight down
+describer: bottom 1/4 faces slightly to the right
+",H,K
+"describer: mister fed ex
+",D,
+"describer: man offering
+describer: standing
+",D,I
+"describer: diamond, blocky, right at bottom
+",H,J
+"describer: bunny ears/mountain
+",E,F
+"describer: sweeping.
+",G,A
+"matcher: nan
+describer: short squatty sideways square head
+",J,F
+"describer: stand face left
+describer: holding plate
+",D,K
+"describer: arms out
+",G,C
+"describer: facing the left, slouched down leaning/sitting against the right side
+",F,F
+"describer: square head going down the backside with a foot being lifted up in front
+",A,A
+"describer: mouse
+",B,A
+"describer: looking forward
+",H,A
+"describer: hi
+matcher: good afternoon
+describer: it has a tail, two arms, diamond head
+describer: snowman bottom almost
+describer: there is a slit under his right arm pit
+matcher: standing or sitting
+describer: standing
+describer: looks like bad snowman with tail, good formed shape although not round
+",B,
+"describer: diamond head on square body. straight line on left
+",J,F
+"describer: yoga
+",I,G
+"describer: this one is a big triangle on the bottom with a square above that, and two smaller triangles above the square
+",E,F
+"describer: alien
+",A,A
+"describer: two diamonds on top and 2 triangle sticking right
+",K,K
+"describer: squatting
+describer: stomach is a pointy triangle
+describer: feet are flat
+",L,F
+"describer: awesome
+describer: sorry thinking
+describer: left side parallel to the left side of the box
+describer: head is in the top middle
+matcher: flat on left side and two triangles poking out of right side?
+describer: yes
+",J,K
+"describer: one leg
+describer: standing on one leg
+describer: i'm trying full time
+matcher: head thrown back?
+describer: can't seem to earn more than about 15 a weeks
+describer: facing left
+describer: this one you asked if was standing on one leg
+",I,
+"describer: looks like the flying nun
+",C,K
+"describer: leg bend
+",L,I
+"describer: it is the man standing on one leg with one extended behind him. he is facing left
+",I,A
+"describer: pointed nose and kicking rock
+",A,
+"describer: head
+describer: with triangle
+",B,F
+"describer: triangle in back of head lady with hands out front, sort of on ground
+",B,F
+"describer: person kneeling facing right with hands raised near head
+",B,F
+"describer: guy with hands out
+",D,K
+"describer: person kneeling with bowl facing right
+",K,J
+"describer: the right carrying thing that is a parrellogram at the bottom
+describer: triangle for neck
+",L,
+"describer: there will be repeats so it'll go faster soon
+matcher: rabbit, high heels, preacher, sky
+describer: one leg standing with a leg behind him again, arms forward
+describer: yes
+",I,J
+"describer: diamond head rectangle like body
+",J,K
+"describer: kneeling with hands in front
+describer: back to your left
+",K,H
+"describer: triangle hanging off of head
+",B,K
+"describer: candle straight back
+",J,A
+"describer: a person looks like they are dancing a taking a long step
+matcher: is it like a walking bird holding a flag?
+matcher: and facing down?
+describer: haha don't see that. i'll try again
+describer: diamond head, triangle to the right of the diamond, triangle bottom right
+describer: rhombus bottom left
+",G,K
+"describer: squatting monk to the right
+",L,G
+"describer: facing left with something in hands standing up
+",D,Image I
+"describer: graduate
+",D,G
+"describer: zig zag body. facing right, diamond head on top
+",L,J
+"describer: weird stretched out guy
+",G,K
+"describer: leg raised in back one foot on ground
+describer: two hands in front
+",I,K
+"describer: sleeping bag with a head
+describer: also, are you lagging too or just me?
+matcher: i don't think so.
+",H,
+"describer: server
+",D,K
+"describer: praying guy
+",K,L
+"describer: facing left, standing, with plate, flat back
+describer: standing
+",D,I
+"describer: knees bent, triangle right, diamond top
+",L,F
+"describer: this guy has one leg kicked up to the left.  he has a beak on the left, and a normal diamond head on the right
+",A,F
+"describer: minnesota
+",J,K
+"describer: squatting
+",L,F
+"describer: cayman with triangle butt
+",K,C
+"describer: thanks
+describer: zig zag body diamond on top
+describer: looks like an s
+",L,
+"describer: shoe
+",G,A
+"describer: yup
+describer: umm to me this looks like a candle
+describer: block with zig zag on one side
+describer: and diamond at top
+",J,K
+"describer: the one with a parallelogram on the bottom left, and two triangles touching with the tip on the right side
+",G,F
+"describer: a diamond on top, straight line on left
+",J,I
+"describer: same again... bunny head
+",E,K
