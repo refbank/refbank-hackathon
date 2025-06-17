@@ -1,0 +1,184 @@
+---
+title: "POS and Definiteness over time"
+author: "Emily Goodwin"
+output:
+  html_document:
+    toc: true
+    df_print: paged
+---
+
+This notebook was written on 6/17/25 during the refbank hackathon at Stanford.
+The original task was to see the distribution of definite, indefinite, and bare nouns in the describer utterances, but I added verbs as well in the plots because it is such an enormous proportion of the utterances. 
+
+Known issues/ next steps: 
+- Much time could be spent better categorizing utterances
+- Current scheme takes the first sentence of each utterance and the first words and codes that: 
+  -e.g. "looks like a duck" is coded as VERB 
+  -e.g. "facing right" is also coded as VERB 
+- Spacy is... fine. Could do better validation of its POS tags. 
+  -e.g. short utterances confuse it: "red backpack" is coded as PROPN
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F)
+library(tidyverse)
+library(here)
+library(ggplot2)
+library(stringi)
+library(spacyr)
+
+theme_set(theme_minimal())
+
+source(here("data_helpers.R"))
+DATA_LOC=here("harmonized_data")
+```
+
+
+# Get data 
+I copied this from the template.rmd notebook and did not touch it or attempt to understand it. 
+
+At the time of running "all_messages" contained 132492 rows. 
+
+```{r, eval=F}
+STAGE_ONE_ONLY = TRUE # change this to include subsequent stages as well, for multi-stage datasets
+
+# options to get trials / choices / messages for all datasets
+all_dirs <- list.dirs(DATA_LOC, full.names = FALSE) |> 
+  stri_remove_empty()
+
+all_messages <- map(all_dirs, \(d) get_messages_full(DATA_LOC, d)) |> 
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_choices <- map(all_dirs, \(d) get_choices_full(DATA_LOC, d)) |>
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_trials <- map(all_dirs, \(d) get_trials_full(DATA_LOC, d)) |>
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+if (STAGE_ONE_ONLY) {
+  all_trials <- all_trials |> 
+    filter(stage_num == 1)
+  all_choices <- all_choices |> 
+    filter(stage_num == 1)
+  all_messages <- all_messages |> 
+    filter(stage_num == 1)
+}
+```
+
+# Initialize spacy 
+```{r}
+spacy_initialize(model = "en_core_web_sm")
+```
+
+
+# Parse describers' messages
+```{r}
+
+# doc_id is unique to each row (each utterance/message, could have 
+# multiple per trial) 
+df.all_describer_messages <- all_messages %>% 
+  mutate(doc_id = seq.int(nrow(.))) %>% 
+  filter(role == 'describer')
+
+#101090
+df.all_describer_messages %>% nrow()
+
+# spacyr prefers TIF formatted data ('doc_id', 'text' columns) 
+# Produces a very long DF with one row per token 
+df.all_describer_messages_parsed <- df.all_describer_messages %>% 
+  select(doc_id, text) %>% 
+  spacy_parse() %>% 
+  #spacyr casts doc_id to chars, stupid 
+  mutate(doc_id = as.integer(doc_id))
+
+#759559
+df.all_describer_messages_parsed %>% nrow()
+
+# Filter out the tags for the first word, label utterance according to tag, 
+# stitch back together with the df containing the actual messages
+df.describer_messages_tagged <- df.all_describer_messages_parsed %>%
+  filter(sentence_id == 1, token_id == 1) %>%
+  mutate(token = str_to_lower(token)) %>% 
+  mutate(V_first = pos == "VERB", 
+         the_first = token  %in% c("the"),
+         indef_first = token %in% c("a", "an"),
+         bare_noun_first = pos %in% c("NOUN", "ADJ") & token!= 'sorry') %>%
+  # Select only the columns we need
+  select(-sentence_id, -token_id, -token, -lemma, -pos, -entity) %>% 
+  right_join(df.all_describer_messages,
+             #join with doc_id (emmy-made label, not a ref-bank native column)
+            join_by(doc_id))
+
+# Check for weird things 
+counts <- df.result %>%
+  rowwise() %>% 
+  mutate(true_count = sum(V_first, the_first, indef_first, bare_noun_first)) 
+
+# 0 coded as simultaneously indef and def, or verb and def
+counts %>% 
+    filter(true_count> 1) %>% nrow()
+# 0 get NA 
+counts %>% 
+    filter(is.na(true_count)) %>% nrow()
+
+# 34089 coded as none (about 1/3 of all describer sentences)
+counts %>% 
+    filter(true_count< 1) %>% nrow()
+  
+```
+
+# Plotting 
+```{r}
+df.agr <- df.result %>% 
+  select(rep_num, text, V_first, the_first, indef_first, bare_noun_first) %>% 
+  pivot_longer(cols = c(V_first, the_first, indef_first, bare_noun_first),
+               names_to = "first_type",
+               values_to = "value") %>%
+  # Filter to keep only the TRUE values
+  filter(value == TRUE)
+
+# Warning: this is filtering out the utterances which are none of these types 
+# which is about 1/3 of your dataset, including mostly "seems like..." 
+df.agr %>% 
+  ggplot(aes(x = first_type, fill = first_type)) + 
+  geom_bar()
+```
+
+```{r}
+
+proportions <- df.result %>% 
+  group_by(rep_num) %>%
+  summarise(
+    total_rows = n(),
+    v_first_true = sum(V_first),
+    the_first_true = sum(the_first), 
+    indef_first_true = sum(indef_first),
+    bare_noun_first_true = sum(bare_noun_first),
+    proportion_v_first = v_first_true / total_rows,
+    proportion_the_first = the_first_true / total_rows,
+    proportion_indef_first = indef_first_true / total_rows,
+    proportion_barenoun_first = bare_noun_first_true / total_rows,
+    .groups = 'drop'
+  ) %>% 
+  pivot_longer(names_to = "kind", 
+               values_to = "proportion", 
+               cols = starts_with("proportion_"))
+
+proportions %>%
+  ggplot(aes(x = rep_num, y = proportion, color = kind)) +
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(limits = c(0, 1))
+
+```
