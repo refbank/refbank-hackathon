@@ -9,8 +9,8 @@ nlp = spacy.load("en_core_web_sm")
 tqdm.pandas()
 
 # File paths (replace with the dataset file path)
-message_path = "harmonized_data/hawkins2019_continual/messages.csv"
-trial_path = "harmonized_data/hawkins2019_continual/trials.csv"
+message_path = "harmonized_data/hawkins2020_characterizing_cued/messages.csv"
+trial_path = "harmonized_data/hawkins2020_characterizing_cued/trials.csv"
 
 # Extract paper name from path
 paper_name = os.path.basename(os.path.dirname(message_path))
@@ -43,6 +43,17 @@ avg_pronouns_per_rep = (
     .sort_values('rep_num')
 )
 
+# For a single example (e.g., first row)
+doc = merged['spacy_doc'].iloc[20]
+print("Original text:", merged['text'].iloc[20])
+print("\nTokens and POS tags:")
+for token in doc:
+    print(f"{token.text:15} {token.pos_:10} {token.dep_:10}")
+
+print("\nSentences:")
+for sent in doc.sents:
+    print(f"- {sent.text}")
+
 # Plot
 plt.figure(figsize=(8, 5))
 plt.plot(avg_pronouns_per_rep['rep_num'], avg_pronouns_per_rep['avg_pronoun_count'], marker='o')
@@ -52,3 +63,5 @@ plt.ylabel("Average # of Pronouns per Message")
 plt.grid(True)
 plt.tight_layout()
 plt.show()
+
+
