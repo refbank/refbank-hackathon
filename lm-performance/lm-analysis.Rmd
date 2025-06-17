@@ -1,0 +1,54 @@
+---
+title: "Template"
+output:
+  html_document:
+    toc: true
+    df_print: paged
+---
+
+Copy me!
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F)
+library(tidyverse)
+library(here)
+library(ggplot2)
+library(stringi)
+library(dplyr)
+library(plyr)
+
+theme_set(theme_bw())
+
+source(here("data_helpers.R"))
+DATA_LOC=here("harmonized_data")
+MODEL_LOC=here("lm-performance")
+```
+
+
+# Get data
+
+```{r, eval=F}
+
+all_csvs <- list.files(paste(MODEL_LOC,"/results/",sep=""), recursive = TRUE, full.names = FALSE)
+
+col = c("user_message","label","model_choice","model")
+data = data.frame(matrix(nrow = 0, ncol = length(col)))
+colnames(data) = col
+
+for (x in all_csvs) {
+  this_csv <- read.csv(paste(MODEL_LOC,"/results/",x,sep=""))
+  this_csv <- this_csv %>% mutate(model = x)
+  data <- rbind.fill(this_csv, data)
+}
+
+data <- data %>% mutate(correct = (label == model_choice))
+
+detach(package:plyr)
+
+```
+
+```{r, eval=F}
+
+model_acc <- data %>% group_by(model) %>% summarise(n = n(), acc = mean(correct))
+
+```

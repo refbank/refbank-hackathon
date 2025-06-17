@@ -188,6 +188,7 @@ describer: sorry
 describer: standing on one leg. diamond on the back
 describer: beak in the front
 ",A,
+<<<<<<< Updated upstream
 "describer: sitting with leg out,  bent a bit
 matcher: no arms out?
 describer: no arms
@@ -201,6 +202,77 @@ describer: top as a point going out on the right side
 matcher: yah but you are doing good
 describer: two triangles on top of a square for head
 ",E,K
+=======
+"describer: head
+describer: with triangle
+",B,F
+"describer: triangle in back of head lady with hands out front, sort of on ground
+",B,F
+"describer: person kneeling facing right with hands raised near head
+",B,F
+"describer: guy with hands out
+",D,K
+"describer: person kneeling with bowl facing right
+",K,J
+"describer: the right carrying thing that is a parrellogram at the bottom
+describer: triangle for neck
+",L,
+"describer: there will be repeats so it'll go faster soon
+matcher: rabbit, high heels, preacher, sky
+describer: one leg standing with a leg behind him again, arms forward
+describer: yes
+",I,J
+"describer: diamond head rectangle like body
+",J,K
+"describer: kneeling with hands in front
+describer: back to your left
+",K,H
+"describer: triangle hanging off of head
+",B,K
+"describer: candle straight back
+",J,A
+"describer: a person looks like they are dancing a taking a long step
+matcher: is it like a walking bird holding a flag?
+matcher: and facing down?
+describer: haha don't see that. i'll try again
+describer: diamond head, triangle to the right of the diamond, triangle bottom right
+describer: rhombus bottom left
+",G,K
+"describer: squatting monk to the right
+",L,G
+"describer: facing left with something in hands standing up
+",D,I
+"describer: graduate
+",D,G
+"describer: zig zag body. facing right, diamond head on top
+",L,J
+"describer: weird stretched out guy
+",G,K
+"describer: leg raised in back one foot on ground
+describer: two hands in front
+",I,K
+"describer: sleeping bag with a head
+describer: also, are you lagging too or just me?
+matcher: i don't think so.
+",H,
+"describer: server
+",D,K
+"describer: praying guy
+",K,L
+"describer: facing left, standing, with plate, flat back
+describer: standing
+",D,I
+"describer: knees bent, triangle right, diamond top
+",L,F
+"describer: this guy has one leg kicked up to the left.  he has a beak on the left, and a normal diamond head on the right
+",A,F
+"describer: minnesota
+",J,K
+"describer: squatting
+",L,F
+"describer: cayman with triangle butt
+",K,C
+>>>>>>> Stashed changes
 "describer: thanks
 describer: zig zag body diamond on top
 describer: looks like an s
