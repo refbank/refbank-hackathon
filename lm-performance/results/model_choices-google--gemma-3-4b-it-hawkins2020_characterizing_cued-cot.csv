@@ -1,0 +1,33 @@
+user_message,label,model_choice
+"describer: a guy standing straight up with his arming going to the left
+",D,A
+"describer: hi
+matcher: hello
+describer: looking for a diamond at the top, triangle pointing towards the left
+describer: close to a person praying on their knees
+matcher: is there a triangle pointing right as well?
+describer: there's a triangle on the right also. just below the diamond and to the right
+describer: could also be seen as a mouse in silhouette
+matcher: anything happening at the bottom?
+describer: like a mountain - we've got 72 of these to get through
+matcher: 72? oops.
+",B,E
+"describer: ice skater
+",I,A
+"describer: ghost man
+",C,E
+"matcher: yeah, just call that one sidekick
+describer: this is one looks like it is sitting down, and their head is looking down.
+matcher: rabbit ears?
+describer: yes
+",E,A
+"describer: s head, karate chop to the left, foot out to the left
+",G,C
+"describer: ghost or man with arms spread
+",C,A
+"describer: shoe
+",G,A
+"describer: ballet dancer
+",G,B
+"describer: kneel right flat back
+",H,F

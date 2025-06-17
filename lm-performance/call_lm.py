@@ -2,6 +2,7 @@
 Call a VLM to
 """
 
+import torch
 import pandas as pd
 import numpy as np
 from vllm import LLM, SamplingParams
@@ -9,6 +10,17 @@ from vllm.sampling_params import GuidedDecodingParams
 from transformers import AutoTokenizer
 from pyprojroot import here
 from PIL import Image
+from argparse import ArgumentParser
+
+def get_image_token(model_name):
+    if "Qwen" in model_name:
+        return "<image>"
+    elif "gemma" in model_name:
+        return "<start_of_image>"
+    elif "llama" in model_name:
+        return "<|image|>"
+    else:
+        raise ValueError(f"Model {model_name} not supported")
 
 def extract_answer(response):
     """
@@ -77,47 +89,64 @@ SYSTEM_PROMPT = """You will be presented with a list of messages between people 
 Think step by step before your answer, with your reasoning contained in <think></think> tags. Then respond with your answer in <answer></answer> tags.
 """
 
+def main(args):
 
-if __name__ == "__main__":
-
-    # TODO: make these arguments that you can change at some point
-    MODEL = "google/gemma-3-27b-it"
-    EXPERIMENT_NAME = "hawkins2020_characterizing_cued"
-
-    df_messages = pd.read_csv(here(f"harmonized_data/{EXPERIMENT_NAME}/messages.csv"))
-    df_trials = pd.read_csv(here(f"harmonized_data/{EXPERIMENT_NAME}/trials.csv"))
+    df_messages = pd.read_csv(here(f"harmonized_data/{args.experiment_name}/messages.csv"))
+    df_trials = pd.read_csv(here(f"harmonized_data/{args.experiment_name}/trials.csv"))
     grid_image = Image.open(here("lm-performance/compiled_grid.png"))
 
     df_trials = preprocess_messages(df_trials, df_messages)
-    df_trials = df_trials.head(1000)
+    df_trials = df_trials.sample(args.n_trials)
 
     llm = LLM(
-        model=MODEL,
-        tokenizer=MODEL,
+        model=args.model,
+        tokenizer=args.model,
         max_model_len=8192,
         max_num_seqs=5,
-        tensor_parallel_size=2,
+        tensor_parallel_size=1,
         gpu_memory_utilization=0.95,
-        
+        dtype=torch.bfloat16,
     )
 
     guided_decoding_params = GuidedDecodingParams(
         choice=["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
     )
 
-    sampling_params = SamplingParams(
-        temperature=0.0,
-        max_tokens=1024,
-        # guided_decoding=guided_decoding_params,
-    )
+    if args.method == "direct":
 
-    tokenizer = AutoTokenizer.from_pretrained(MODEL)
+        system_prompt = """You will be presented with a list of messages between people playing a reference game, where the describer has to get the matcher to choose an image from a list of images. Your goal is to guess which of the images the describer is trying to get the matcher to choose. The images, with their labels, are shown in the image.
+
+        Please answer with just the letter corresponding to the image you think the describer is trying to get the matcher to choose.
+        """
+
+        sampling_params = SamplingParams(
+            temperature=0.0,
+            max_tokens=1024,
+            guided_decoding=guided_decoding_params,
+        )
+
+
+    elif args.method == "cot":
+
+        system_prompt = """You will be presented with a list of messages between people playing a reference game, where the describer has to get the matcher to choose an image from a list of images. Your goal is to guess which of the images the describer is trying to get the matcher to choose. The images, with their labels, are shown in the image.
+
+        Think step by step before your answer, with your reasoning contained in <think></think> tags. Then respond with your answer in <answer></answer> tags.
+        """
+
+        sampling_params = SamplingParams(
+            temperature=0.0,
+            max_tokens=1024,
+        )
+    else:
+        raise ValueError(f"Method {args.method} not supported")
+
+    tokenizer = AutoTokenizer.from_pretrained(args.model)
 
     prompts = []
     for user_message in df_trials["user_message"]:
         chat = [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": "<|image|>" + user_message}
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": get_image_token(args.model) + user_message}
             ],
         prompt = tokenizer.apply_chat_template(
             chat, add_generation_prompt=True, tokenize=False
@@ -132,11 +161,24 @@ if __name__ == "__main__":
         sampling_params=sampling_params,
         use_tqdm=True,
     )
+    print(f"responses: {responses}")
     model_choices = [extract_answer(response) for response in responses]
     df_trials["model_choice"] = model_choices
 
-    model_name = MODEL.replace("/", "--")
-    df_trials.to_csv(here(f"lm-performance/model_choices-{model_name}-{EXPERIMENT_NAME}.csv"), index=False)
+    model_name = args.model.replace("/", "--")
+    df_trials.to_csv(here(f"lm-performance/results/model_choices-{model_name}-{args.experiment_name}-{args.method}.csv"), index=False)
 
     accuracy = compute_accuracy(model_choices, df_trials["label"])
     print(f"Model accuracy: {accuracy}")
+
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument("--model", type=str, default="google/gemma-3-4b-it")
+    parser.add_argument("--experiment_name", type=str, default="hawkins2020_characterizing_cued")
+    parser.add_argument("--n_trials", type=int, default=100)
+    parser.add_argument("--method", type=str, default="cot")
+    args = parser.parse_args()
+
+    main(args)
