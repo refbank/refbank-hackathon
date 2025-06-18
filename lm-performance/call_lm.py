@@ -11,6 +11,8 @@ from transformers import AutoTokenizer
 from pyprojroot import here
 from PIL import Image
 from argparse import ArgumentParser
+from functools import partial
+from ast import literal_eval
 
 
 def get_image_token(model_name):
@@ -59,53 +61,57 @@ def get_user_message(messages):
     return user_message
 
 
-def preprocess_messages(df_trials, df_messages, include_history):
+def preprocess_messages(row, history_type):
 
-    df_messages = df_messages.sort_values(["trial_id", "message_number"])
-    df_messages["info"] = df_messages.apply(
-        lambda x: {
-            "text": x["text"],
-            "player_id": x["player_id"],
-            "role": x["role"],
-            "message_number": x["message_number"],
-        },
-        axis=1,
-    )
-    df_message_lists = (
-        df_messages.groupby("trial_id")["info"]
-        .apply(list)
-        .reset_index()
-        .rename(columns={"info": "messages"})
-    )
+    chat_messages = []
+    if history_type != "none":
+        message_history_trunc = row["message_history_trunc"]
+        if not isinstance(message_history_trunc, str):
+            message_history = []
+        else:
+            print(f"message_history_trunc: {message_history_trunc}")
+            message_history = literal_eval(message_history_trunc.replace("nan", "''"))
 
-    df_trials = df_trials.sort_values(["game_id", "rep_num", "trial_num"])
-    df_trials = df_trials.merge(df_message_lists, on="trial_id", how="left")
+        target_history = literal_eval(row["target_history_trunc"])
+        for messages, target in zip(message_history, target_history):
+            user_message = get_user_message(messages)
+            chat_messages.append({"role": "user", "content": user_message})
+            chat_messages.append({"role": "assistant", "content": target})
 
-    df_trials["user_message"] = df_trials["messages"].apply(get_user_message)
-    df_trials["label"] = df_trials["target"]
-    df_trials = df_trials[["trial_id", "user_message", "label"]]
+    this_trial_messages = row["messages"]
+    if not isinstance(this_trial_messages, str):
+        chat_messages.append({"role": "user", "content": "describer: \n"})
+    else:
+        this_trial_messages = literal_eval(this_trial_messages.replace("nan", "''"))
+        chat_messages.append({"role": "user", "content": get_user_message(this_trial_messages)})
 
-    df_trials = df_trials[df_trials["user_message"] != ""]
-
-    return df_trials
-
-
-SYSTEM_PROMPT = """You will be presented with a list of messages between people playing a reference game, where the describer has to get the matcher to choose an image from a list of images. Your goal is to guess which of the images the describer is trying to get the matcher to choose. The images, with their labels, are shown in the image.
-
-Think step by step before your answer, with your reasoning contained in <think></think> tags. Then respond with your answer in <answer></answer> tags.
-"""
+    return chat_messages
 
 
 def main(args):
 
-    df_messages = pd.read_csv(
-        here(f"harmonized_data/{args.experiment_name}/messages.csv")
-    )
-    df_trials = pd.read_csv(here(f"harmonized_data/{args.experiment_name}/trials.csv"))
+    # df_messages = pd.read_csv(
+    #     here(f"harmonized_data/{args.experiment_name}/messages.csv")
+    # )
+    # df_trials = pd.read_csv(here(f"harmonized_data/{args.experiment_name}/trials.csv"))
+    # TODO: make this actually depend on the experiment name, maybe do preprocessing in this script
+    # rather than FormatMessages.ipynb
+    df_with_history = pd.read_csv(here("lm-performance/trials_with_history.csv"))
+    if args.n_trials is not None:
+        df_with_history = df_with_history.head(args.n_trials)
     grid_image = Image.open(here("lm-performance/compiled_grid.png"))
 
-    df_trials = preprocess_messages(df_trials, df_messages, args.include_history)
-    df_trials = df_trials.head(args.n_trials)
+    # if we're shuffling histories, shuffle the histories
+    if args.history_type == "shuffled":
+        perm = np.random.permutation(len(df_with_history))
+        df_with_history["message_history_trunc"] = df_with_history["message_history_trunc"].iloc[perm]
+        df_with_history["target_history_trunc"] = df_with_history["target_history_trunc"].iloc[perm]
+
+    df_with_history["chat_prompt"] = df_with_history.apply(
+        partial(preprocess_messages, history_type=args.history_type), axis=1
+    )
+
+    print(f"example chat prompt: {df_with_history['chat_prompt'].sample(1).iloc[0]}")
 
     llm = LLM(
         model=args.model,
@@ -152,13 +158,17 @@ def main(args):
     tokenizer = AutoTokenizer.from_pretrained(args.model)
 
     prompts = []
-    for user_message in df_trials["user_message"]:
+    for chat_prompt in df_with_history["chat_prompt"]:
         chat = (
             [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": get_image_token(args.model) + user_message},
+                {
+                    "role": "system",
+                    "content": system_prompt + get_image_token(args.model),
+                },
+                *chat_prompt,
             ],
         )
+        print(f"chat: {chat}")
         prompt = tokenizer.apply_chat_template(
             chat, add_generation_prompt=True, tokenize=False
         )[0]
@@ -179,18 +189,20 @@ def main(args):
         model_choices = [response.outputs[0].text for response in responses]
     else:
         model_choices = [extract_answer(response) for response in responses]
-    
-    df_trials["model_choice"] = model_choices
+
+    df_with_history["model_choice"] = model_choices
+
+    df_with_history = df_with_history[["trial_id", "stage_num", "rep_num", "trial_num", "chat_prompt", "model_choice", "target"]]
 
     model_name = args.model.replace("/", "--")
-    df_trials.to_csv(
+    df_with_history.to_csv(
         here(
-            f"lm-performance/results/model_choices-{model_name}-{args.experiment_name}-{args.method}.csv"
+            f"lm-performance/results/model_choices-{model_name}-{args.experiment_name}-{args.method}-history-{args.history_type}.csv"
         ),
         index=False,
     )
 
-    accuracy = compute_accuracy(model_choices, df_trials["label"])
+    accuracy = compute_accuracy(model_choices, df_with_history["target"])
     print(f"Model accuracy: {accuracy}")
 
 
@@ -200,9 +212,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--experiment_name", type=str, default="hawkins2020_characterizing_cued"
     )
-    parser.add_argument("--n_trials", type=int, default=100)
-    parser.add_argument("--method", type=str, default="cot")
-    parser.add_argument("--include_history", action="store_true")
+    parser.add_argument("--n_trials", type=int, default=None)
+    parser.add_argument("--method", type=str, default="direct")
+    parser.add_argument("--history_type", type=str, default="yoked", choices=["yoked", "shuffled", "none"])
     args = parser.parse_args()
 
     main(args)
