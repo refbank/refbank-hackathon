@@ -9,8 +9,8 @@ nlp = spacy.load("en_core_web_sm")
 tqdm.pandas()
 
 # File paths
-message_path = "harmonized_data/hawkins2020_characterizing_uncued/messages.csv"
-trial_path = "harmonized_data/hawkins2020_characterizing_uncued/trials.csv"
+message_path = "yoon2019_audience/messages.csv"
+trial_path = "yoon2019_audience/trials.csv"
 
 # Extract paper name from path
 paper_name = os.path.basename(os.path.dirname(message_path))

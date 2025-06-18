@@ -4,8 +4,8 @@ import seaborn as sns
 import os
 
 # File paths
-message_path = "harmonized_data/boyce2024_interaction/messages.csv"
-trial_path = "harmonized_data/boyce2024_interaction/trials.csv"
+message_path = "harmonized_data/eliav2023_semantic/messages.csv"
+trial_path = "harmonized_data/eliav2023_semantic/trials.csv"
 
 # Extract paper name from the folder name
 paper_name = os.path.basename(os.path.dirname(message_path))
@@ -23,7 +23,7 @@ df = df[df["role"] == "describer"].copy()
 # Define hedge words
 hedge_words = {
     "maybe", "perhaps", "probably", "possibly", "seems", "i think", "i guess",
-    "sort of", "kind of", "somewhat", "a little", "not sure", "might", "could",
+    "sort of", "kind of", "kinda", "somewhat", "a little", "not sure", "might", "could",
     "likely", "appears", "looks like", "i feel like", "i suppose"
 }
 
