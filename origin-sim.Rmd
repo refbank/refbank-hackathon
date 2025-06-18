@@ -1,0 +1,139 @@
+---
+title: "Convention formation sim"
+author: "Alvin Tan"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+library(shiny)
+library(tidyverse)
+library(stringi)
+library(here)
+
+source(here("data_helpers.R"))
+```
+
+
+```{r}
+get_tbl <- function(con = DATA_LOC, dataset_name, tbl_name, is_sim = FALSE) {
+  # con is fake rn, and takes in the root dir for all datasets
+  if (missing(dataset_name)) {
+    stop("dataset_name must be provided")
+  }
+  if (missing(tbl_name)) {
+    stop("tbl_name must be provided")
+  }
+  
+  file_path <- file.path(con, dataset_name, paste0(tbl_name, ".csv"))
+  if (!file.exists(file_path)) {
+    stop(paste("File does not exist:", file_path))
+  }
+  
+  out <- read_csv(file_path, show_col_types = FALSE)
+  
+  if (tbl_name == "conditions" | is_sim) {
+    out <- out |> 
+      mutate(structure = structure |> 
+               as.character() |> 
+               replace_na("other") |> 
+               factor(levels = c("thin", "medium", "med_thick", "thick", "network-swap", "naive-swap")) |> 
+               fct_drop())
+  }
+  out
+}
+
+get_sim <- function(con = SIM_CACHE, dataset_name, tbl_name) {
+  get_tbl(con, dataset_name, tbl_name, is_sim = TRUE)
+}
+```
+
+```{r}
+DATA_LOC = here("../refbank-import/harmonized_data")
+SIM_LOC = here("../refbank-viz/sim_cache")
+all_dirs <- list.dirs(DATA_LOC, full.names = FALSE) |> 
+  stri_remove_empty()
+
+all_tonext <- map(all_dirs, \(d) get_sim(SIM_LOC, d, "to_next")) |> 
+  list_rbind() |> 
+  filter(paper_id != "yoon2019_audience") |>
+  mutate(
+    game_id = case_when(
+      paper_id == "hawkins2021_respect" ~ str_sub(game_id, 1, -7),
+      paper_id == "hawkins2023_frompartners" ~ str_sub(game_id, 1, -3),
+      T ~ game_id
+    ),
+    last_rep = case_when(
+      paper_id == "eliav2023_semantic" ~ 5,
+      structure == "network-swap" ~ 12,
+      T ~ 6
+    )
+  )
+```
+
+```{r}
+origins <- all_tonext |> 
+  left_join(
+    earliest_describer_fuzzy |> 
+      select(game_id, target, stage_num, later = rep_num, 
+             paper_id, structure, group_size, convention_formed = fuzzy_regex),
+    by = join_by(game_id, target, stage_num, structure, group_size, later, paper_id)
+  ) |> 
+  mutate(post_convention = convention_formed) |> 
+  group_by(game_id, target, stage_num) |> 
+  fill(post_convention) |> 
+  ungroup() |> 
+  left_join(
+    earliest_describer_fuzzy |> 
+      filter(rep_num == 1) |> 
+      select(game_id, target, stage_num, 
+             paper_id, structure, group_size, convention_first = fuzzy_regex),
+    by = join_by(game_id, target, stage_num, structure, group_size, paper_id)
+  ) |> 
+  mutate(post_convention = coalesce(post_convention, convention_first),
+         convention_status = rowSums(cbind(post_convention, convention_formed), na.rm = TRUE) |> 
+           replace_na(0) |> 
+           factor(levels = c(0, 2, 1),
+                  labels = c("pre", "form", "post")))
+```
+
+```{r}
+ggplot(origins, aes(x = convention_status, y = sim, fill = convention_status)) +
+  geom_boxplot() +
+  facet_wrap(~structure) +
+  labs(x = "Convention status", 
+       y = "Adjacent round similarity", 
+       fill = "Convention formation status") +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
+```
+
+```{r}
+origins_conv0 <- all_tonext |> 
+  filter(structure != "network-swap") |> 
+  left_join(
+    earliest_describer_fuzzy |> 
+      select(game_id, target, stage_num, convention_round = rep_num, 
+             paper_id, structure, group_size, convention_formed = fuzzy_regex),
+    by = join_by(game_id, target, stage_num, structure, group_size, paper_id)
+  ) |> 
+  mutate(rep_num = later - convention_round)
+
+ggplot(origins_conv0,
+       aes(x = rep_num, y = sim, col = str_c(structure, group_size))) +
+  geom_vline(xintercept = 0, lty = "dashed") +
+  geom_point(position = position_jitter(width = .2), alpha = .05) +
+  geom_smooth(aes(group = str_c(structure, group_size)),
+              data = origins_conv0 |> filter(rep_num <= 0),
+              method = "lm") +
+  geom_smooth(aes(group = str_c(structure, group_size)),
+              data = origins_conv0 |> filter(rep_num >= 0),
+              method = "lm") +
+  labs(x = "Convention status", 
+       y = "Adjacent round similarity", 
+       col = "Structure & group size") +
+  theme_bw() +
+  theme(panel.grid = element_blank())
+```
+
