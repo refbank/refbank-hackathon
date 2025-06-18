@@ -1,0 +1,2505 @@
+trial_id,user_message,label,model_choice
+1585,"describer: hi
+matcher: hello
+describer: looking for a diamond at the top, triangle pointing towards the left
+describer: close to a person praying on their knees
+matcher: is there a triangle pointing right as well?
+describer: there's a triangle on the right also. just below the diamond and to the right
+describer: could also be seen as a mouse in silhouette
+matcher: anything happening at the bottom?
+describer: like a mountain - we've got 72 of these to get through
+matcher: 72? oops.
+",B,C
+1586,"describer: awesome. this one looks like a seal
+",G,B
+1587,"describer: this one looks like a small dog balancing a ball on its nose
+",K,B
+1588,"describer: this looks like one of the spy vs spy guys looking down and walking with a flag on his right shoulder.
+",A,C
+1589,"describer: nice. this is a diamond on top of what looks like a state - top of state is a straight line
+",J,J
+1590,"describer: ok, could be a bow or bunny ears in profile on top of a lightning bolt
+",E,B
+1591,"describer: the other possible diamond/state combo. state looks like indiana
+",H,D
+1592,"describer: person ice skating with leg out and arms out in front
+",I,C
+1593,"describer: preacher with hands up in air
+describer: air
+",C,B
+1594,"describer: graduate giving speech at lectern, in profile
+matcher: pointing a direction?
+describer: the lectern is pointing to the left
+",D,C
+1595,"describer: looks like shadow of a person on their knees facing right
+describer: bottom half makes lightning bolt
+",L,K
+1596,"describer: same graduate sitting down with knees up and feet on ground. facing left
+describer: looking down at feet
+",F,E
+1597,"describer: first diamond on top of state shape again
+describer: straight line on top
+",J,D
+1598,"describer: graduate sitting and looking down from 2 questions ago
+",F,F
+1599,"describer: spy vs spy
+",A,The image the describer is trying to get the matcher to choose is Image B.
+1600,"describer: graduate at lectern
+matcher: left?
+describer: yes
+",D,F
+1601,"describer: rabbit ears lightning bolt base looking right
+",E,C
+1602,"describer: seal with ball - diamond on left strange hook shape on right
+",G,B
+1603,"describer: mouse from beginning
+describer: mountain base
+",B,A
+1604,"describer: indiana with diamond in top
+",H,C
+1605,"describer: preacher
+",C,J
+1606,"describer: dog with ball
+",K,B
+1607,"describer: shadow person lighting bolt base
+",L,L
+1608,"describer: ice skater
+",I,C
+1609,"describer: mouse
+describer: repeat mouse mountain base
+",B,I
+1610,"describer: state with flat top diamond
+",J,J
+1611,"describer: dog with ball
+",K,B
+1612,"describer: shadow person lightning bolt base
+",L,C
+1613,"describer: grad at lectern
+",D,D
+1614,"describer: spy
+",A,I
+1615,"describer: sitting grad pointed left
+",F,B
+1616,"describer: seal with ball
+",G,J
+1617,"describer: preacher
+",C,J
+1618,"describer: rabbit ears lightning base
+",E,B
+1619,"describer: indiana diamond
+",H,I
+1620,"describer: skate
+",I,K
+1621,"describer: dog with ball
+",K,B
+1622,"describer: shadow lightning bolt
+",L,E
+1623,"describer: skate
+",I,C
+1624,"describer: rabbit ears
+",E,A
+1625,"describer: diamond flat top state
+",J,K
+1626,"describer: grad lectern
+",D,J
+1627,"describer: sitting grad
+",F,F
+1628,"describer: preacher
+",C,J
+1629,"describer: spy
+",A,I
+1630,"describer: seal
+",G,H
+1631,"describer: mouse
+",B,H
+1632,"describer: indiana diamond
+",H,I
+1633,"describer: skate
+",I,G
+1634,"describer: spy
+",A,I
+1635,"describer: shadow lightning bolt
+",L,E
+1636,"describer: seal
+",G,H
+1637,"describer: indiana diamond
+",H,I
+1638,"describer: flat top state diamond
+",J,J
+1639,"describer: sitting grad
+",F,F
+1640,"describer: preacher
+",C,J
+1641,"describer: mouse
+",B,H
+1642,"describer: grad lectern
+",D,J
+1643,"describer: dog ball
+describer: diamond on nose dog on hind legs
+",K,G
+1644,"describer: rabbit ears
+",E,A
+1645,"describer: indiana
+",H,I
+1646,"describer: shadow lightning
+",L,K
+1647,"describer: sitting grad
+describer: grad
+",F,D
+1648,"describer: dog and ball -
+",K,B
+1649,"describer: seal
+",G,H
+1650,"describer: flat top diamond
+",J,B
+1651,"describer: skate
+",I,C
+1652,"describer: rabbit ears
+",E,A
+1653,"describer: grad lectern
+",D,J
+1654,"describer: preacher
+",C,J
+1655,"describer: mouse
+",B,H
+1656,"describer: you did awesome!
+describer: spy
+",A,G
+7102,"matcher: hello! :-)
+describer: ok, so a diamond for the head and a full body with the point towards the right?
+describer: hello there
+describer: this moight be tough, but i will try my best
+matcher: okay so like if the picture had  'hands' they would be pointing to the right?
+describer: point is at the bottom
+describer: no hands
+describer: almost looks like they are sitting
+matcher: so the bottom part of the picture is pointing right and the rest of the body is straight?
+describer: yes, i think
+",H,The image the describer is trying to get the matcher to choose is **F**.
+7103,"describer: awesome job
+matcher: wohoo
+describer: ok, diamond is on the left side. looks like two hands on the right one on top and the other lower. the body all the way to the left
+",G,E
+7104,"describer: yes
+describer: looks like he is standing on one leg
+",I,G
+7105,"describer: straight out behind
+describer: sorry
+describer: standing on one leg. diamond on the back
+describer: beak in the front
+",A,The image the describer is trying to get the matcher to choose is **C**.
+7106,"describer: sitting with leg out,  bent a bit
+matcher: no arms out?
+describer: no arms
+",F,F
+7107,"describer: arms raised like a ghost
+",C,C
+7108,"describer: diamond as head with point on top. almost a full rectangle as a body, but an indent on the bottom pointing in
+describer: top as a point going out on the right side
+",J,G
+7109,"describer: ha, these are hard to describe!
+matcher: yah but you are doing good
+describer: two triangles on top of a square for head
+",E,C
+7110,"describer: thanks
+describer: zig zag body diamond on top
+describer: looks like an s
+",L,C
+7111,"describer: looks like a priest in a robe
+describer: hands pointing left
+matcher: like he is standing? with feet and hands pointing left?
+describer: yes
+",D,C
+7112,"describer: square and triangle on top
+describer: small triangle on the bottom left
+matcher: does it look like someone kneeling with their arms stretched out?
+describer: not really
+describer: you can see a small triangle on the left hand side on the bottom of the figure
+",B,B
+7113,"describer: looks like someone praying
+describer: not the s shaped one
+",K,J
+7114,"describer: someone sitting with their knees up
+",F,K
+7115,"describer: standing on one foot with the other pointed out towards the right
+",I,B
+7116,"describer: looks like a small mountain and a large one with a square and 2 triangles on top
+",E,E
+6073,"matcher: howdy
+",H,
+7372,"matcher: hi
+",B,
+5961,"describer: hello there.  so, the image you'll want to select it looks almost like a person kneeling on the ground.
+",B,B
+5962,"describer: this one is standing on one leg, with one leg out, almost like an elephant head.
+describer: the head looks like an elephant that is.
+",A,E
+5963,"matcher: got one!
+describer: this one looks like it's laying in bed, with like half a blanket on them, the rest maybe cut by scissors.
+describer: haha, yup!
+describer: this is a very rough one to describe .
+matcher: the one with a triangle on the back?
+describer: i don't think so.  the head is right in the middle of it, if the entire shape was filled in, it'd look like they were in a bed.
+matcher: count how many points are on it
+matcher: 9?
+describer: i think so - just go with your gut, this one is rough for me.
+",J,F
+5964,"describer: ok, this is the tallest one kneeling down with their arms out it looks like.
+",K,I
+5965,"describer: this one looks like a person flying.
+",C,C
+5966,"describer: ok, not the kneeling one from last time, but the other one kneeling that's tall.
+",L,E
+5967,"describer: the one that looks like the trix rabbit ears.  the one you thought it was when i gave that horrible bed description.
+",E,E
+5968,"describer: ok, pretty much completely shapeless person.
+matcher: the one with the diamond on top pointing up?
+describer: yeah
+",H,H
+5969,"describer: bah, i'm no good at this.
+matcher: it's hard
+describer: ok, so...this one is the other one with odd ears, not the previous.
+describer: almost like a person laying back
+describer: there's a square on one side, and an odd shape on the other side.
+matcher: is the square pointing right and slightly to the bottom?
+describer: angled downward.  it isn't the one that looks like the guy is standing up.
+",G,F
+5970,"matcher: i should have went with my gut on that one
+describer: haha, just do that from now on, this is rough.
+describer: ok, so this pretty much looks like a guy sitting, his legs angled a little upward, his head looking down.
+",F,F
+5971,"describer: balancing on one leg, one foot behind him like he's throwing a kick
+matcher: the one with the two triangles pointing to the left?
+describer: yup.
+",I,G
+5972,"describer: ok, this looks like a person with their arms held out.  doesn't look like either of the kneelers that you selected before.  but, same general position.
+describer: if that makes sense.
+",D,A
+5973,"describer: ok, this is the one that looks the most like a kneeling person with their arms out.
+",K,B
+5974,"describer: we'll get there eventually haha.
+matcher: they're all so similar
+describer: yup, it's no big deal - we'll get what we get.
+describer: ok, so....this looks like the one you selected last time, except instead of kneeling, they're kinda talller.
+",D,D
+5975,"describer: i'mma call that one dumbo from now on.
+describer: the one you selected
+matcher: nan
+describer: this one is the one that looks like a person flying
+",C,C
+5976,"describer: ok....this is the one i struggled to describe the last time haha
+describer: uh.  there's a diamond for a head.  no other feature you can really make out.
+",J,J
+5977,"matcher: did you see the one i clicked on?
+matcher: we need to refer to that one as a car seat
+describer: perfect.
+describer: ok, this is the one that is leaning back on a triangle, the triangle is pointed downwards.
+describer: it has two weird shaped ears.
+",G,B
+5978,"describer: ok.  this one looks like they're kneeling with their arms out, the shape is almost a lightning bolt.
+",L,C
+5979,"describer: ok that one is lightning bolt from now on
+matcher: yep
+describer: ok, now this guy looks like he's doing a karate kick.
+describer: two triangles aiming to the left
+matcher: the one with slanted square shape?
+",I,G
+5980,"describer: ok that one is karate kid
+describer: this one is car seat.
+matcher: nan
+",H,F
+5981,"describer: this one is dumbo
+matcher: wait i forgot which was dumb let me think a sec
+describer: looks like they're balanced on one leg, the other leg off the ground, a square to the right of their head
+",A,C
+5982,"describer: ok.  so, their body looks kind of like a disconnected triangle, and they're kneeling.
+describer: there is a triangle on the left, and a triangle on the right, that aren't connected.
+",B,C
+5983,"matcher: that one looks like someone looking up to sky
+describer: this looks like a person sitting down, their knees bent, laid back.
+describer: ok, we'll call that one sky.  i think thats all the nicknames we shoudl use though, hard to remember them all haha
+",F,F
+5984,"describer: the one with the trix rabbit ears looking down.
+",E,I
+5985,"matcher: call him trix
+describer: there ya go
+describer: the one with their arms out that isn't kneeling.
+",D,A
+5986,"describer: car seat
+matcher: that one looks like a statue
+matcher: lets call it statue
+",H,G
+5987,"describer: the one you selected i think we said was lightning bolt
+describer: this one is karate kid.
+",I,A
+5988,"describer: trix
+",E,E
+5989,"describer: god, i hate this one.  we're definitely nicknaming this one if you get it.
+describer: it looks like a piece missing, and if you connected it, it'd look like the person was in a bed.  only their head you can really make out.
+",J,F
+5990,"describer: ok, that one is bed .
+matcher: nan
+describer: this one is the one that looks the most like they're kneeling with their arms out.  the tallest.
+",K,B
+5991,"describer: that one is lightning bolt
+matcher: those two are hardest
+describer: this is sky
+",G,F
+5992,"matcher: rats
+describer: the one that's laying back, knees up.
+",F,E
+5993,"describer: ok, this is lightning bolt.
+",L,D
+5994,"describer: the flying dude.
+",C,C
+5995,"describer: the one you got wrong when i said guy glancing at the sky.
+",B,C
+5996,"describer: dumbo
+describer: pretty much the one with the weird head, balancing on one leg.
+",A,B
+5997,"describer: car seat
+matcher: yeah i forgot for a sec
+",H,F
+5998,"describer: haha it's ok, if you're unsure, ill help jog the memory.
+describer: dumbo again.
+",A,I
+5999,"describer: trix
+",E,C
+6000,"describer: flying dude
+",C,C
+6001,"describer: the guy reclining with knees up
+",F,E
+6002,"describer: ok, not lightning bolt, but the other one kneeling.
+",K,F
+6003,"describer: lightning bolt
+",L,L
+6004,"describer: the one you got wrong when i said sky glancer
+describer: it looks like someone kneeling, their torso is like two triangles, not connected too tightly.
+describer: the head balanced on the gap of the two triangles.
+",B,B
+6005,"matcher: crap
+describer: the one you just got wrong haha
+",G,The describer is likely trying to get the matcher to choose Image C.
+6006,"matcher: nan
+describer: no no, it was the opposite both times haha
+matcher: it's been a long day
+describer: haha it's ok, we're doing pretty good!
+describer: karate kid
+",I,A
+6007,"describer: ok, not lightning bolt, or the other dude, but the one with their hands out.
+",D,B
+6008,"describer: bed
+",J,F
+6009,"describer: lightning bolt
+matcher: i feel like im going to need a psychologist after this
+",L,A
+6010,"describer: haha, 'why were you referring to the ink blot as the trix rabbit?'
+describer: karate kid this one
+",I,C
+6011,"describer: not lighting bolt, but the other kneeling
+",K,F
+6012,"describer: ok, the one that always gives us trouble.  sky glancer.
+describer: he's leaning back on a triangle, with a square on the top left of his face.
+",G,B
+6013,"describer: very good.
+describer: flying dude.
+",C,C
+6014,"describer: ok, the one we always get wrong when it comes to sky glancer.
+describer: not sky glancer but the other fellow.
+",B,I
+6015,"describer: dumbo
+",A,D
+6016,"describer: car seat
+",H,F
+6017,"describer: bed
+",J,F
+6018,"describer: ok, not lighnting bolt or the other kneeling, but the other one with their hands out.
+describer: same position just swapped, basically, not on their knees.
+matcher: is that with the triangle on the back pointing the top left?
+describer: doesn't look like anything on their back.
+describer: you'd almost say they were standing if there weren't a triangle at the bottom of the image.
+",D,C
+6019,"describer: bah, that ones probably gonna stumble us for the rest.  but, we have a good system!
+matcher: i think we always get that one wrong
+describer: this one is the dude laying back with his knees up
+",F,F
+6020,"describer: trix
+",E,C
+6021,"describer: karate kid
+",I,A
+6022,"describer: ok, we get another shot at the one we always get wrong
+describer: its in the same position as the two keneling with their arms outstretched
+",D,G
+6023,"describer: there we go.
+describer: bed.
+",J,B
+6024,"describer: trix
+",E,C
+6025,"describer: dumbo
+",A,D
+6026,"describer: not lightning bolt, but kneeling down.
+",K,E
+6027,"describer: lightning bolt
+",L,L
+6028,"describer: guy with his knees up
+",F,C
+6029,"describer: the one we always get wrong for sky glancer.
+",B,I
+6030,"describer: on top of the two severed triangles
+describer: bah, oh well.
+describer: car seat.
+matcher: i totally brain farted on that one
+describer: haha it's ok.  i think we did really great, it was fun working with you!
+",H,B
+6031,"matcher: yes you as well!
+describer: flying dude.
+",C,C
+6032,"describer: and, to close us out, they gotta give us sky glancer.
+describer: dude leaning back on the triangle with the square on the top left.
+describer: almost looks like he has a wizard hat on
+matcher: he is like sitting on a triange pointing down?
+describer: yeah
+",G,B
+6794,"matcher: hi
+describer: man standing on one foot while raising his arms
+describer: with 'loose sleeves'
+",A,C
+6795,"matcher: are you there?
+describer: man standing holding a plate in front of him
+",D,H
+6796,"describer: man kneeling down fully, facing right
+",K,E
+6797,"describer: man kneeling down while raising both arms
+describer: facing right
+matcher: is one arm in front and one arm in back?
+describer: yes
+",B,E
+6798,"describer: man sitting down on ground, facing left
+matcher: are his knees bent?
+matcher: ??
+",F,B
+6799,"matcher: is there a lag time?  it seems like a long time between when i select and you go on to the next one.
+describer: weird one... looks like spread on floor and raising one arm
+describer: kinda like wearing a dress
+",G,F
+6800,"describer: man with knees half bent, holding a plate
+",L,C
+6801,"describer: sitting down, almost facing camera
+describer: like a legless man
+",H,"None of the images perfectly match the description provided. The describer might need to provide more specific details or clarify the image they are thinking of. If forced to choose, image **F** is the closest match as it is sitting and has a horizontal orientation, but it still has legs. However, it is important to note that this is not a perfect match."
+6802,"describer: standing one on leg, other leg lifted and pointing back
+describer: he is facing left
+",I,A
+6803,"describer: raising arms in y shape, no legs
+",C,C
+6804,"describer: like man standing up, no arms and legs visible
+",J,D
+6805,"describer: bunny ears
+",E,A
+6806,"describer: ok?
+matcher: i didn't get a message..sorry
+matcher: repeat please
+describer: bunny ears
+matcher: i selected it and it said it was correct.  i'll do it again.
+",E,The image the describer is trying to get the matcher to choose is **A**.
+6807,"describer: spreading arms in y
+",C,C
+6808,"describer: kneeling holding plate, facing right
+",K,E
+6809,"describer: only one with completely straight vertical line on left side
+",J,A
+6810,"describer: sitting down facing left
+matcher: knees bent?
+describer: yes
+",F,E
+6811,"describer: legless man
+describer: sitting
+describer: on ground
+matcher: facing ?
+describer: facing us almost
+",H,F
+6812,"describer: the weird one
+matcher: they're all weird :d
+describer: woman in dress spread on floor
+",G,E
+6813,"describer: kneeling down with arms raised to left and right
+",B,E
+6814,"matcher: sorry
+describer: standing with plate, facing left
+",D,B
+6815,"describer: standing one one leg with head tilted back and to the right
+matcher: arms out in front of him?
+describer: yes
+",A,C
+6816,"describer: knees half bent
+matcher: sitting or standing?
+describer: like he is about to kneel down
+",L,B
+6817,"describer: standing one leg, other leg pointing to right
+matcher: where are his arms?
+matcher: or facing which direction?
+describer: in front of him
+",I,A
+6818,"describer: kneeling with arms spread to left and right
+",B,E
+6819,"describer: kneeling down facing right
+describer: holding plate in front
+",K,E
+6820,"describer: weird woman in dress with elbow raised
+describer: (elbow on right)
+matcher: i'm not seeing it.  sorry...anything else?
+matcher: wait
+matcher: got it
+",G,C
+6821,"matcher: crap!
+matcher: i'm really sorry!
+describer: standing on 1 leg both arms raised
+",A,C
+6822,"describer: legless man
+describer: sitting facing us
+",H,H
+6823,"describer: straight line on left
+",J,A
+6824,"describer: stand on 1 leg, other leg points to right
+",I,B
+6825,"describer: standing facing left, holding plate
+",D,C
+6826,"describer: sitting on ground, knees bent
+",F,F
+6827,"describer: bunny ears
+",E,I
+6828,"describer: knees half bent
+matcher: standing or sitting
+describer: facing right
+",L,B
+6829,"describer: arms spread out in y shape
+",C,A
+6830,"describer: stand on 1 leg, other leg pointing to right
+",I,B
+6831,"describer: kneeling down arms spread to left and right
+",B,E
+6832,"describer: stand on 1 leg, raising both arms
+describer: head tilted back to right
+",A,C
+6833,"describer: straight line on left
+",J,A
+6834,"describer: standing holding plate, facing left
+",D,C
+6835,"describer: legless man sits facing us
+",H,F
+6836,"describer: weird woman in dress elbow raised
+",G,C
+6837,"describer: kneeling facing right
+describer: holding plate
+",K,E
+6838,"describer: sitting on ground with knees bent
+",F,F
+6839,"describer: knees half bent about to kneel
+",L,I
+6840,"describer: arms in y shape
+",C,B
+6841,"describer: bunny ears
+",E,I
+6842,"describer: arms in y
+",C,B
+6843,"describer: kneeling facing right
+",K,F
+6844,"describer: about to kneel
+",L,G
+6845,"describer: woman with elbow raised
+",G,F
+6846,"describer: sitting knees bent
+",F,B
+6847,"describer: legless
+describer: facing us
+",H,H
+6848,"describer: straight line on left
+",J,A
+6849,"describer: kneel arms spread left and right
+",B,F
+6850,"describer: stand 1 leg arms raised
+",A,B
+6851,"describer: stand 1 leg
+describer: other leg point to right
+",I,F
+6852,"describer: standing facing left
+describer: holding plate
+",D,B
+6853,"describer: bunny ears
+",E,I
+6854,"describer: stand 1 leg, other leg points right
+",I,C
+6855,"describer: stand facing left
+describer: holding plate
+",D,B
+6856,"describer: woman with elbow raised
+",G,C
+6857,"describer: straight line on left
+",J,A
+6858,"describer: stand 1 leg, both arms raised
+",A,C
+6859,"describer: kneel facing right
+describer: holds plate
+",K,I
+6860,"describer: y arms
+",C,A
+6861,"describer: kneel arms spread
+",B,E
+6862,"describer: sit knees bent
+",F,B
+6863,"describer: about to kneel
+",L,G
+6864,"describer: bunny
+",E,E
+6865,"describer: legless sits facing us
+describer: nice playing with ya!
+matcher: same here!  thanks!
+",H,J
+5000,"matcher: is there a triangle on it?
+",C,"The describer is likely thinking of one of the images that contain a triangle: B, C, E, G, or I. More information from the describer is needed to determine the exact image."
+5001,"matcher: are there triangles on it?
+describer: kinda
+describer: theres a triangle sticking out to the right
+describer: looks like a person with their knees bent to the right
+",L,The image the describer is trying to get the matcher to choose is **B**.
+5002,"describer: looks like a person standing with something in their hands facing left
+",D,A
+5003,"describer: triangles on left and right and a tilted box on top
+describer: looks kinda like someone is kneeling
+",B,B
+5004,"describer: this one kinda weird
+describer: triangle on bottom and top right
+describer: box on top like a head
+describer: shaped like a 'J'
+",G,D
+5005,"describer: diamond for a head
+describer: pointed triangles sticking right
+describer: looks like someone kneeling again
+",K,G
+5006,"describer: not much sticking out, kinda looks like used tooth paste
+",H,D
+5007,"describer: looks like a guy facing left with a leg sticking up
+",A,C
+5008,"describer: resembles a bottle with a diamond shaped cap
+describer: flat surface that the diamond is sitting on
+",J,H
+5009,"describer: hmm has kinda a t shape
+describer: with lots going on the left side
+describer: 2 triangles and a diamond on top
+",I,C
+5010,"describer: looks like a mountain side with a cube and 2 triangles on top
+",E,E
+5011,"describer: looks like a person sitting down with legs slightly bent
+describer: like leaned up against a wall
+",F,F
+5012,"describer: 'J' shape again
+",G,J
+5013,"describer: person kneeling with 2 diamonds on top
+",K,E
+5014,"describer: weird t or y shape with triangles+diamond on left side
+",I,E
+5015,"describer: looks like a man with both arms raised into the air
+describer: leaning left
+",C,G
+5016,"describer: mountain side with cube and triangles on top
+",E,E
+5017,"describer: man holding an object facing left
+",D,A
+5018,"describer: man with leg lifted in the air facing left
+",A,C
+5019,"describer: used toothpaste again
+",H,D
+5020,"describer: man on knees with triangles facing left and right
+",B,G
+5021,"describer: bent legs facing right with triangle sticking out
+",L,C
+5022,"describer: man sitting up against a wall
+",F,F
+5023,"describer: diamond on top a table or head
+",J,G
+5024,"describer: triangles facing left and right with diamond on top
+",B,A
+5025,"describer: two diamonds on top and 2 triangle sticking right
+",K,C
+5026,"describer: man holding an object to the left
+",D,B
+5027,"describer: diamond on top head/table
+",J,G
+5028,"describer: knees bent, triangle right, diamond top
+",L,E
+5029,"describer: diamond on top two triangles facing left
+",I,E
+5030,"describer: mountain side, diamond 2 triangles
+",E,C
+5031,"describer: man with hands in the air
+",C,C
+5032,"describer: man with a leg up
+",A,A
+5033,"describer: 'J' shape
+",G,J
+5034,"describer: man sitting against a wall
+",F,F
+5035,"describer: used toothpaste
+",H,K
+5036,"describer: diamond on top of 2 left triangles
+",I,C
+5037,"describer: diamond on top head/table
+",J,C
+5038,"describer: man with knees slighty bent
+describer: triangle sticking out right
+",L,B
+5039,"describer: 'J' shape
+",G,J
+5040,"describer: man on knees arms sticking left and right
+",B,B
+5041,"describer: used toothpaste
+",H,K
+5042,"describer: man with arms in air
+",C,A
+5043,"describer: man sitting against wall
+",F,F
+5044,"describer: man on knees two diamonds on upper section
+",K,I
+5045,"describer: mountainside with cube plus 2 triangles
+",E,B
+5046,"describer: man with leg up
+",A,A
+5047,"describer: man with object facing left
+describer: *facing
+",D,B
+5048,"describer: mountain side with cube plus 2 triangles
+",E,G
+5049,"describer: diamond on top 2 left triangles
+",I,E
+5050,"describer: man on knees, triangle arms facing both sides
+",B,E
+5051,"describer: used toothpaste
+",H,K
+5052,"describer: diamond on top head/table
+",J,G
+5053,"describer: man with leg up
+",A,A
+5054,"describer: man on knees with large triangle right
+",K,E
+5055,"describer: 'J' shape
+",G,J
+5056,"describer: man on knees with large triangle facing right
+describer: same one you chose last time
+matcher: with the flat bottom?
+describer: yeah. it came up the choice before last
+",L,B
+5057,"describer: man sitting against a wall
+",F,F
+5058,"describer: man with arms up
+",C,B
+5059,"describer: man with object facing left
+",D,B
+5060,"describer: 'J' shape
+",G,J
+5061,"describer: man with arms in the air
+",C,E
+5062,"describer: man on knees, two triangles left, 1 right
+",B,C
+5063,"describer: mountain side, cube + 2 triangles
+",E,B
+5064,"describer: man with a leg up
+",A,A
+5065,"describer: man with object facing left
+",D,B
+5066,"describer: used toothpaste
+",H,D
+5067,"describer: man on knees with 2 triangles on top
+describer: *diamond sorry
+",K,E
+5068,"describer: man sitting against a wall
+",F,F
+5069,"describer: man with knees slightly bent
+describer: flat bottom
+",L,B
+5070,"describer: diamond on top 2 triangles facing left
+",I,E
+5071,"describer: diamond on top head/table
+",J,G
+1801,"describer: hi
+matcher: hi
+describer: the object looks like it is standing on one foot with the leg in the air backwards
+",I,D
+1802,"describer: the object has a diamond on top and the left is a straight box with three points to the right
+",J,G
+1803,"describer: the object has a diamond on top and the middle looks like a house
+",H,C
+1804,"matcher: finally
+describer: nan
+describer: diamond on top the object is sitting down with feet to the left
+",F,B
+1805,"describer: diamond on top straight part is on right side standing position with feet on ground facing left direction
+",D,C
+1806,"describer: diamond on top both hands are outstretched in air
+",C,C
+1807,"describer: object is sitting down like it's leaning back. the diamond is on left side with two triangles one in air the other on floor
+",G,The image the describer is trying to get the matcher to choose is **B**.
+1808,"describer: square and one triangle are leaning towards the right
+describer: both objects are touching
+",B,B
+1809,"describer: i have no idea how to explain this one . diamond is on top touching triangle
+describer: and it sitting on top of another object
+",K,B
+1810,"describer: two triangles are touching box
+",E,B
+1811,"describer: diamond is touching triangle that looks like it is kneeling but the legs aren't all the way on the ground
+",L,C
+1812,"describer: box is to the right of the object that is standing up on one food with the other foot in air
+",A,C
+1813,"describer: same as last picture one foot in air
+",A,C
+1814,"describer: one foot in air but not same as last picture
+",I,C
+1815,"describer: object is kneeling down
+",K,E
+1816,"matcher: i'll remember the 'kneeling' down picture next time you use that clue
+describer: one box touching triangle to the right
+",B,The image the describer is trying to get the matcher to choose is **G**.
+1817,"describer: ok cool
+describer: sitting down relaxing
+describer: facing left
+",F,E
+1818,"describer: both hands in air
+",C,C
+1819,"describer: leaning back on right hand
+",G,I
+1820,"describer: sitting down facing right
+",E,F
+1821,"describer: diamond on top of triangle facing right
+",H,C
+1822,"describer: left side is straight. one diamond on top of object
+",J,D
+1823,"describer: object is kneeling down but choose the one you chose last time
+",L,F
+1824,"describer: object has straight side on the right and diamond on top
+",D,G
+1825,"describer: object is kneeling down don't choose the one you chose last time
+",L,F
+1826,"describer: object is kneeling down. but don't choose the one you just chose
+",K,F
+1827,"describer: straight side on left diamond on top
+",J,C
+1828,"describer: foot kicked out to left side in air
+",I,B
+1829,"describer: both hands in air
+",C,C
+1830,"describer: sitting down facing the left
+",F,The image the describer is trying to get the matcher to choose is **Image E**.
+1831,"describer: leaning back on left hand sitting down
+describer: i mean on right hand
+",G,F
+1832,"describer: standing up one foot in the air facing the left
+",A,C
+1833,"describer: sitting down facing right two triangles in square
+",E,F
+1834,"describer: one diamond into triangle facing right
+",H,C
+1835,"describer: looks like a pinwheel facing the right sitting on floor
+",B,E
+1836,"describer: facing left looks like it's holding something in hand
+",D,B
+1837,"describer: facing left with something in hands standing up
+",D,B
+1838,"describer: sitting down leaning back on right hand. facing left
+",G,F
+1839,"describer: both hands in air
+",C,C
+1840,"describer: one foot in air facing left side
+",A,B
+1841,"describer: choose the same one you just picked
+",I,I cannot determine the correct image without knowing the previous choice made by the matcher. Please provide the previous selection to proceed.
+1842,"describer: left side is straight diamond on top
+",J,H
+1843,"describer: kneeling down facing right side
+",L,F
+1844,"describer: diamond touching triangle looks like a pinwheel
+",B,E
+1845,"describer: kneeling down facing the right side with legs on ground
+matcher: is the bottom part a rhombus or some weird triangle shape
+describer: weird shape
+",K,B
+1846,"matcher: for that one next time, say weird shape kneeling and i'll know what you mean :)
+describer: cool :)
+describer: triangle touching house
+describer: diamond touching house
+",H,C
+1847,"describer: pinwheel at top the smaller pinwheel
+",E,E
+1848,"describer: sitting down facing left
+",F,The image the describer is trying to get the matcher to choose is **Image E**.
+1849,"describer: facing left with right foot in air
+matcher: are both arms outstretched?
+describer: no
+",A,A
+1850,"describer: both arms in air
+",C,The image the describer is trying to get the matcher to choose is **C**.
+1851,"describer: sitting down facing left
+",F,B
+1852,"describer: large pinwheel
+",B,E
+1853,"describer: diamond on top left straight side
+",J,B
+1854,"describer: facing left with something in hands
+",D,B
+1855,"describer: sitting down leaning back on right hand
+",G,F
+1856,"describer: kneeling down weird shape
+",K,E
+1857,"describer: kneeling down
+",L,E
+1858,"describer: diamond on house
+",H,C
+1859,"describer: foot in air something in hands
+matcher: are the arms outstretched?
+describer: yes
+",I,C
+1860,"describer: small pinwheel
+",E,E
+1861,"describer: one foot outstretched hands
+",I,B
+1862,"describer: one foot no hands
+",A,B
+1863,"describer: diamond on top straight side on right
+",D,G
+1864,"describer: large pinwheel
+",B,E
+1865,"describer: both hands in air
+",C,C
+1866,"describer: kneeling
+",L,F
+1867,"describer: sitting down facing left
+",F,The image the describer is trying to get the matcher to choose is **I**.
+1868,"describer: small pinwheel
+",E,E
+1869,"describer: diamond on house
+",H,C
+1870,"describer: facing left leaning back on right hand
+describer: sitting
+",G,G
+1871,"describer: diamond on top straight side on left
+",J,G
+1872,"matcher: , we did it, nice working with you :d
+describer: last one good job
+describer: kneeling weird job
+",K,F
+433,"describer: diamond on a self
+",J,J
+434,"describer: man lying down
+",F,F
+435,"describer: woman in dress
+",G,C
+436,"describer: standing on one leg
+",I,D
+437,"describer: sitting with arms wide
+",B,G
+438,"describer: sitting bunny rabbit
+",E,F
+439,"describer: standing and pointing ,one way
+",D,B
+440,"describer: 'pick the last one you picked
+matcher: i have already forgotten what the last one was, beyond standing and pointing and i was not right. the one kind of pointing up i think i chose?
+describer: squatting and pointing one way
+",L,F
+441,"describer: pointed nose and kicking a rock
+",A,G
+442,"describer: kneeling and praying
+",K,L
+443,"describer: man with no arms and legs
+",H,D
+444,"describer: flying person
+",C,C
+445,"describer: bum sitting against the wall
+",F,F
+446,"describer: rabbit ears ,sitting
+",E,G
+447,"describer: squatting and pointing right
+",L,F
+448,"describer: diamond on a pedestal
+",J,C
+449,"describer: arms wide and kneeling
+",B,C
+450,"describer: flying again
+",C,K
+451,"describer: woman in dress dancing salsa
+",G,C
+452,"describer: standing and pointing left
+",D,A
+453,"describer: standing on one leg
+",I,D
+454,"describer: kneeling and praying
+",K,L
+455,"describer: no arm and no legs
+",H,D
+456,"describer: pointed nose and kicking rock
+",A,C
+457,"describer: diamond on a pedestal
+",J,C
+458,"describer: kneeling and praying
+",K,L
+459,"describer: woman in dress dancing salsa
+",G,E
+460,"describer: arms wide kneeling
+",B,E
+461,"describer: bunny rabbit again
+",E,The image the describer is trying to get the matcher to choose is **B**.
+462,"describer: bum against the wall
+",F,F
+463,"describer: standing on one leg
+",I,D
+464,"describer: standing and pointing left
+",D,A
+465,"describer: pointed nose, kicking rock
+",A,C
+466,"describer: no arms and no legs
+",H,D
+467,"describer: squatting ,pointed right
+",L,F
+468,"describer: flying guy
+",C,C
+469,"describer: salsa woman
+",G,C
+470,"describer: kneeling and praying
+",K,L
+471,"describer: on one leg guy
+",I,D
+472,"describer: squatting pointed right
+",L,F
+473,"describer: bum against wall
+",F,K
+474,"describer: point nose, rock kicker
+",A,B
+475,"describer: arms wide
+",B,A
+476,"describer: rabbit ears
+",E,A
+477,"describer: rabbit ears
+",D,A
+478,"describer: flying
+",C,K
+479,"describer: no arms and no legs
+",H,D
+480,"describer: diamond on pedestal
+",J,J
+481,"describer: bum
+",F,F
+482,"describer: squatting pointed right
+",L,F
+483,"describer: salsa woman
+",G,C
+484,"describer: kneeling and praying
+",K,L
+485,"describer: arms wide
+",B,A
+486,"describer: standing pointed left
+",D,A
+487,"describer: diamond on pedestal
+",J,J
+488,"describer: no arms or legs
+",H,D
+489,"describer: rabbit ears
+",E,A
+490,"describer: on one leg
+",I,D
+491,"describer: pointed nose rock kicker
+",A,B
+492,"describer: flying
+",C,C
+493,"describer: kneel and pray
+",K,K
+494,"describer: diamond, pedestal
+",J,C
+495,"describer: standing, pointed left
+",D,A
+496,"describer: arms wide
+",B,A
+497,"describer: leg
+",F,A
+498,"describer: salsa woman
+",G,C
+499,"describer: one leg
+",I,D
+500,"describer: flying
+",C,C
+501,"describer: squatting ,pointed right
+",L,F
+502,"describer: pointed nose
+",A,A
+503,"describer: rabbit ears
+",E,A
+504,"describer: no arms or legs
+",H,D
+3274,"describer: hi there
+matcher: hey
+matcher: what am i looking for here?
+describer: click on the one that looks like a tail is pointing to the right
+describer: and is standing
+",I,B
+3275,"matcher: nice. we got it.
+describer: nice
+describer: this one looks like something standing with one foot kicking out to the left of the other leg
+describer: the 'head' be tilted towards the top right corner
+matcher: are both 'feet' pointed in the same direction?
+describer: yes
+",A,The image the describer is trying to get the matcher to choose is **B**.
+3276,"describer: this one looks like something sitting int he bottom left corner and it has bunny ears
+matcher: it's facing to the right?
+describer: yes
+",E,B
+3277,"describer: this one is kind of chunky and looks like someone kneeling
+describer: the head is attached to another square similar to the head
+matcher: with it's arms outstretched and facing to the right?
+describer: the feet kind of look like they point up
+describer: yes
+",K,The image the describer is trying to get the matcher to choose is **B**.
+3278,"describer: this is another kneeling but the arms are pointed to the left and it has another triangle awkwardly attached on the right side of the head
+matcher: looks kind of like a mouse?
+describer: yes good call
+",B,C
+3279,"describer: this is a kneeling that is one block with no arms
+describer: feet/knees pointing to the right
+describer: kind of
+",H,E
+3280,"describer: this one has it's arms wide open
+matcher: like it's falling to the left?
+describer: yes
+",C,C
+3281,"describer: this one has its knees bent and arms out to the right
+",L,B
+3282,"describer: this one is kind of like the rabbit but it is looking to the left and seems like it is reclining
+matcher: does it have a triangle tail?
+describer: yes
+",G,E
+3283,"describer: this looks like someone standing and is kind of blocky
+describer: looks like arms are out to the left
+",D,A
+3284,"describer: this one has the head perfectly centered on a a square is body
+describer: could be an upside down bird
+",J,J
+3285,"describer: person laying/sitting with foot and leg out to the left
+",F,B
+3286,"describer: arms spread out leaning left
+",C,C
+3287,"describer: standing with arms to left very blocky
+",D,A
+3288,"describer: bending knees arms to the right
+",L,B
+3289,"describer: rabbit sitting down facing to the right
+",E,F
+3290,"describer: person kneeling with up pointed feet and head connected to square
+",K,C
+3291,"describer: blocky kneeling knees to right
+",H,E
+3292,"describer: upside down bird
+",J,E
+3293,"describer: person sitting with legs to the left
+",F,"The image the describer is trying to get the matcher to choose is **B** or **F**. Both images show a person sitting with legs to the left. If I had to choose one, I would say **B** as it is the first match found. However, both **B** and **F** are correct based on the description."
+3294,"describer: the mouse looking one
+",B,G
+3295,"describer: ugly bunny with triangle tail
+",G,I
+3296,"describer: standing with one foot and leg lifted up pointing to the left
+matcher: kicker. got it.
+",A,A
+3297,"describer: kicker good word
+matcher: thanks. ;d
+describer: the one standing with the tail to the right
+describer: let's call it the flyer
+matcher: sounds good. nice name.
+",I,H
+3298,"describer: the mouse
+",B,I
+3299,"describer: sitting bunny looking to the right
+",E,K
+3300,"describer: bent knees with arms to the right
+",L,B
+3301,"describer: upside down bird
+",J,E
+3302,"describer: arms spread wide
+",C,A
+3303,"describer: the flyer
+",I,C
+3304,"describer: ugly laying down bunny with triangle tail
+describer: call it drunken bunny?
+matcher: .
+matcher: ugly bunny is fine.
+",G,C
+3305,"describer: blocky kneeling knees to right
+",H,E
+3306,"describer: the kicker
+",A,C
+3307,"describer: blocky stander with arms to the left
+describer: stander
+",D,A
+3308,"describer: person sitting legs to the left
+",F,F
+3309,"describer: kneeling with feet pointed up and arms right
+describer: double square
+",K,F
+3310,"describer: upside down bird
+",J,L
+3311,"describer: person sitting legs to the left
+",F,F
+3312,"describer: ugly bunny
+",G,I
+3313,"describer: the mouse
+",B,I
+3314,"describer: arms spread wide
+",C,A
+3315,"describer: the kicker
+",A,C
+3316,"describer: knees bent arms to the right
+",L,B
+3317,"describer: sitting bunny
+",E,F
+3318,"describer: blocky kneeling no arms knees point right
+",H,B
+3319,"describer: kneeling feet pointed up arms right double square
+matcher: feet up kneeling. got it.
+",K,I
+3320,"describer: stander with arms to the left
+",D,A
+3321,"describer: the flyer
+",I,B
+3322,"describer: arms spread wide
+",C,A
+3323,"describer: kneeling feet pointed up
+",K,F
+3324,"describer: sitting bunny
+",E,K
+3325,"describer: person sitting feet to the left
+",F,K
+3326,"describer: the kicker
+",A,C
+3327,"describer: bent knees arms to the right
+",L,C
+3328,"describer: the flyer
+",I,C
+3329,"describer: blocky kneeling knees pointing to the right
+",H,F
+3330,"describer: upside down bird
+",J,E
+3331,"describer: stander with arms pointing to the left
+",D,A
+3332,"describer: the mouse
+",B,I
+3333,"describer: ugly bunny
+",G,I
+3334,"describer: bent knees arms to the right
+",L,C
+3335,"describer: person sitting feet to the left
+",F,K
+3336,"describer: the kicker
+",A,C
+3337,"describer: ugly bunny
+",G,G
+3338,"describer: arms spread wide
+",C,A
+3339,"describer: the flyer
+",I,C
+3340,"describer: stander with arms out to the left
+",D,A
+3341,"describer: the mouse
+",B,I
+3342,"matcher: final stretch, man.
+matcher: good cooperating with ya!
+describer: kneeling with toes pointed up. so close...good job to you too
+",K,E
+3343,"describer: blocky kneeling knees pointed right
+describer: no arms
+",H,B
+3344,"describer: upside down bird
+",J,E
+3345,"describer: sitting bunny
+",E,K
+6033,"matcher: hi
+describer: hello
+matcher: let's make some money eh?
+describer: ok
+describer: the image kind of look like they are praying
+matcher: that could be 3 of them, which way they face?
+describer: they face to the right.
+matcher: tail in the back or no tail?
+describer: no tail
+",L,H
+6034,"describer: ththe tail is really far out on this image
+",G,L
+6035,"matcher: nice work, that was much quicker
+describer: yes :)
+describer: this time it's the one with the tail
+",K,The image the describer is trying to get the matcher to choose is **L**.
+6036,"describer: this figure looks like it's wearing a cape
+matcher: does it look like it's facing out to me
+describer: it's looks like a black ghost
+describer: yes
+",H,G
+6037,"describer: this is one is facing you and is pointing to the left
+matcher: looks like it's holding a top hat to the left
+describer: yes that one
+",D,C
+6038,"describer: this one is facing you and it looks like it's standing on one leg
+matcher: side kick?
+describer: and it has its arms out
+describer: yes
+",I,B
+6039,"matcher: yeah, just call that one sidekick
+describer: this is one looks like it is sitting down, and their head is looking down.
+matcher: rabbit ears?
+describer: yes
+",E,G
+6040,"matcher: there's your name for that too
+describer: there's a guy who is sitting down with his legs angle up in front of him
+describer: he has a block head
+",F,E
+6041,"describer: the figure is sitting down with their head up and triangle arms pointing out. they have a triangle hat.
+describer: they're kind of looking up with a square head
+describer: and their feet in front of them.
+matcher: looks like a girl in a pony tail in a kimono facing left
+describer: yes
+",B,F
+6042,"describer: this one is facing you. they are pointing right. but there bottom is flat on the ground.
+",J,C
+6043,"matcher: not sure what happened there...i clicked on one, and another lit up
+describer: we'll get this one :)
+describer: this one is doing a weird dance.
+",A,E
+6044,"describer: this one looks like it's flying. it looks like it's coming off the page a bit. it's drawn at an angle
+",C,C
+6045,"describer: this one is pointing to the left and it's bottom is flat on the ground
+",D,A
+6046,"matcher: same thing just happened
+matcher: like my selection box has a mind of its own
+describer: it's okay. it's the one with the cape again.
+describer: it's facing you
+matcher: it's jagged on the right, correct, flat under the head
+describer: it has no arms and looks like it's floating.
+",H,C
+6047,"describer: it's the last one you chose
+matcher: oops
+describer: flat on the side and jagged on the right
+",J,H
+6048,"describer: this one has a tail pointing up and arms pointing right. it looks like it's facing you.
+",K,The image the describer is trying to get the matcher to choose is **B**.
+6049,"describer: this is is praying with it's arms out and is sitting down with it's head titled up. has a triangle headwrap
+",B,The image the describer is trying to get the matcher to choose is **B**.
+6050,"describer: this guy is sitting down with his legs out and is looking up and facing the left.
+",F,B
+6051,"describer: this one is flying and is drawn at an angle.
+",C,C
+6052,"describer: this one is facing you and it' bending with it's arms facing the right.
+",L,G
+6053,"describer: this one is doing a sidekick
+",I,B
+6054,"describer: this one has a head that is about to fall off and looks like he is standing on one leg. his hands are pointing down
+",A,C
+6055,"describer: this one has the bunny ears
+",E,A
+6056,"describer: this one has the tail way out in front of them. the arm is pointing down
+",G,B
+6057,"describer: head is about to fall off and is standing on one leg with their hand pointing down
+",A,G
+6058,"describer: this one is facing you. it has no hands
+",H,C
+6059,"describer: this one is pointing to the right. it does not have a tail.
+",L,D
+6060,"describer: this one is flat on one side and rigid on the other.
+",J,A
+6061,"describer: this one is praying with their arms to the left and a triangle headpiece
+",B,E
+6062,"describer: this one has the bunny ears
+",E,A
+6063,"describer: this one is pointing to the right and has a tail
+",K,B
+6064,"describer: this one is on the ground facing the left and is looking up
+",F,E
+6065,"describer: this one is drawn at an angle
+",C,E
+6066,"describer: this one looks like it's holding a top hat
+",D,J
+6067,"describer: one of the leg is all the way out and is bigger than the other
+",G,B
+6068,"describer: the one doing the sidekick
+",I,B
+6069,"matcher: good rhythm now
+describer: rabbit ears
+",E,A
+6070,"describer: the one facing you
+",H,J
+6071,"describer: triangle headwrap
+",B,"The image the describer is likely trying to get the matcher to choose is **B**, **E**, **G**, or **I**. However, without more context, it's difficult to pinpoint the exact one. If I had to choose one, I would go with **B** as it is the first option that fits the description."
+6072,"describer: sitting down with legs out, looking up, facing the left
+",F,B
+6362,"describer: hi
+matcher: hi
+describer: the shape looks like someone is holding a tray, the tray is to their right.
+",D,B
+6363,"describer: this shape has a straight angle looks like a square or rectangle on one side
+describer: only one like it
+",J,C
+6364,"describer: this shape is standing straight, both shoulders are at a downward slope, no arms outstretched
+",H,The image the describer is trying to get the matcher to choose is **C**.
+6365,"describer: this shape is holding a tray, tray is on my right. there are two similar figures this one does not look like a zig zag at the bottom.
+",K,B
+6366,"matcher: got to be faster. i have 22 min left on this hit
+describer: this figure is leaning towards my left. one foot is planted the other is up so the legs form an upside down 'left' shape.
+",I,B
+6367,"describer: looks like someone has arms outstretched
+",C,A
+6368,"matcher: that is angel
+describer: holding tray on my right
+describer: i'm doing the best i can
+describer: zig zag shape
+",L,C
+6369,"describer: figure kneeling arms out sleeves look like triangles
+",B,E
+6370,"matcher: well done
+describer: kicking leg up head looks like beak
+",A,C
+6371,"describer: upper body at angle, leg on my left is resting on floor
+matcher: last was back kick
+describer: ok
+matcher: more info needed
+describer: leg on my left looks like shin is on floor
+",G,C
+6372,"describer: resting against something on my right
+describer: sitting
+",F,F
+6373,"describer: sitting resting on my left
+",E,F
+6374,"describer: kneeling with arms out
+describer: repeat
+",B,B
+6375,"matcher: sorry
+matcher: sorry
+describer: my left is straight angle like square, another one we did before
+describer: before
+describer: shoulder is 90 degree
+",J,D
+6376,"describer: straight figure shoulders downwards angle
+",H,D
+6377,"describer: leaning sitting on my right
+",F,G
+6378,"describer: back kick
+",I,C
+6379,"describer: holding tray on my left
+",D,F
+6380,"describer: beak head
+",A,A
+6381,"describer: angel
+matcher: my bad
+",C,C
+6382,"describer: tray on my right zig zag
+",L,K
+6383,"describer: tray on my right not zig zag
+describer: zag
+",K,H
+6384,"describer: sitting leaning my left
+",E,E
+6385,"describer: leg laying on floor
+describer: shin down
+",G,E
+6386,"describer: angel
+",C,G
+6387,"describer: beak head
+",A,A
+6388,"describer: zig zag
+",L,C
+6389,"describer: not zig zag
+describer: zag
+",K,H
+6390,"describer: leaning on my right
+",F,The image the describer is trying to get the matcher to choose is **C**.
+6391,"describer: leaning on left
+",E,A
+6392,"describer: back kick
+",I,B
+6393,"describer: tray on my left
+",D,A
+6394,"describer: shoulders down
+",H,F
+6395,"describer: left side straight angle
+",J,A
+6396,"describer: shin down
+",G,A
+6397,"describer: kneeling arms out
+",B,B
+6398,"describer: left straight angle
+",J,A
+6399,"describer: angel
+",C,C
+6400,"describer: left tray
+",D,A
+6401,"describer: shin down
+",G,A
+6402,"describer: zig zag
+",L,C
+6403,"describer: beak head
+",A,A
+6404,"describer: back kick
+",I,C
+6405,"describer: leaning right
+",F,B
+6406,"describer: leaning left
+",E,E
+6407,"describer: not zig zag
+",K,D
+6408,"matcher: fuck
+describer: arms out kneeling
+",B,E
+6409,"describer: shoulders down
+",H,F
+6410,"describer: leaning left
+",E,A
+6411,"describer: back kick
+",I,B
+6412,"describer: not zig zag
+",K,D
+6413,"describer: shoulders down
+",H,F
+6414,"describer: left tray
+",D,A
+6415,"describer: beak
+",A,C
+6416,"describer: shin down
+",G,A
+6417,"describer: leaning right
+",F,B
+6418,"describer: zig zag
+",L,E
+6419,"describer: kneeling
+describer: arms out
+",B,B
+6420,"describer: left straight angle
+",J,A
+6421,"describer: angel
+",C,C
+6422,"describer: kneeling
+",B,F
+6423,"describer: left straight
+matcher: i suck
+",J,A
+6424,"describer: no worries
+describer: beak
+",A,G
+6425,"describer: angel
+",C,I
+6426,"describer: zig zag
+",L,C
+6427,"describer: tray left
+",D,F
+6428,"describer: leaning left
+",E,A
+6429,"describer: shin down
+",G,A
+6430,"describer: shoulders down
+",H,F
+6431,"describer: back kick
+",I,B
+6432,"describer: leaning right
+",F,B
+6433,"describer: not zig zag
+",K,D
+721,"describer: it looks like a person holding up two arms
+",C,A
+722,"describer: this one looks squared off with a square at the top
+",J,A
+723,"describer: it is wider at the bottom and looks like a square tipping of a cliff and a triangle hanging off
+",B,B
+724,"describer: it looks like a person kneeling on one knee to propose
+",G,F
+725,"describer: it looks like someone kneeling
+",H,F
+726,"matcher: hey, why don't we name them
+describer: ok
+describer: this one looks like it's begging for money
+describer: how would we go about naming them
+describer: *how
+matcher: i think maybe describe each one's position fully once and name it like 'beggar' or 'bunny ears'
+matcher: then each round we could go pretty quick
+describer: we can try that
+matcher: okay! i see: one that looks like one foot standing on the ground and one foot kicking back, that could be 'kick back'
+matcher: one looks like sitting leaning against a wall looking down, that could be 'sad man'
+matcher: one with two arms up could be 'arms up'
+matcher: one sitting against a wall with triangles on the head can be 'bunny ears'
+matcher: one kind of looks like a bundled baby to me? like a blob with the head on top, i think you said it was kneeling
+describer: oh yeah i see that now too.
+matcher: one standing with one foot on the ground and one kicking out in front could be 'front kick'
+describer: ok
+matcher: one kneeling that looks like it is looking at its hands with a triangle at its back like a hood? facing right - that could be 'praying monk'
+describer: ok i think i know which one you mean
+matcher: cool
+matcher: one standing facing left with hands out could be the beggar
+matcher: one is sort of crouching, not kneeling all the way, facing right with hands out, can be 'crouching'
+describer: he is the one we need this round
+matcher: okay i'll click him now
+",L,D
+727,"matcher: nice
+describer: bunny ears is next
+",E,G
+728,"describer: now kick back
+",I,B
+729,"describer: sad man
+",F,E
+730,"describer: this is one that looks like he is begging but we didn't name him yet facing to the right
+matcher: kneeling?
+describer: yeah
+",K,E
+731,"matcher: that last one can be kneeling beggar
+describer: ok
+describer: beggar
+",D,L
+732,"describer: front kick
+",A,C
+733,"describer: beggar again
+",D,The image the describer is trying to get the matcher to choose is Image A.
+734,"describer: praying monk
+",B,G
+735,"describer: baby
+",H,I
+736,"describer: we didn't name this one but it's squared of on the left and has a diamond on top
+",J,C
+737,"matcher: that can be diamond top
+describer: k
+describer: sad man
+",F,K
+738,"describer: crouching
+",L,F
+739,"describer: bunny ears
+",E,A
+740,"describer: kneeling beggar
+",K,F
+741,"describer: front kick
+",A,G
+742,"describer: arms up
+",C,B
+743,"describer: this is the last one we didn't name
+describer: kinda looks like he is on one knee
+matcher: with arms out front and head back?
+describer: yeah
+",G,E
+744,"matcher: that one can be arms out
+describer: k
+describer: kick back
+",I,K
+745,"describer: diamond top
+",J,G
+746,"describer: kick back
+",I,K
+747,"describer: praying monk
+",B,I
+748,"describer: kneeling beggar
+",K,I
+749,"describer: kick front
+",A,D
+750,"describer: arms out
+",G,A
+751,"describer: bunny ears
+",E,K
+752,"describer: crouching
+",L,F
+753,"describer: beggar
+",D,B
+754,"describer: arms up
+",C,B
+755,"describer: sad man
+",F,E
+756,"describer: baby
+",H,I
+757,"describer: kick back
+",I,K
+758,"describer: crouching
+",L,F
+759,"describer: beggar
+",D,B
+760,"describer: bunny ears
+",E,E
+761,"describer: arms up
+",C,B
+762,"describer: front kick
+",A,C
+763,"describer: praying monk
+",B,I
+764,"describer: diamond top
+",J,G
+765,"describer: kneeling beggar
+",K,F
+766,"describer: arms out
+",G,A
+767,"describer: sad man
+",F,E
+768,"describer: baby
+",H,I
+769,"describer: crouching
+",L,F
+770,"describer: diamond top
+",J,G
+771,"describer: kick back
+",I,K
+772,"describer: baby
+",H,I
+773,"describer: front kick
+",A,C
+774,"describer: beggar
+",D,A
+775,"describer: arms up
+",C,B
+776,"describer: arms out
+",G,A
+777,"describer: bunny ears
+",E,I
+778,"describer: sad man
+",F,E
+779,"describer: kneeling beggar
+",K,I
+780,"describer: praying monk
+",B,I
+781,"describer: diamond top
+",J,G
+782,"describer: bunny ears
+",E,K
+783,"describer: beggar
+",D,B
+784,"describer: baby
+",H,I
+785,"describer: kneeling
+describer: beggar
+describer: sorry
+",K,F
+786,"matcher: :)
+describer: arms out
+",G,A
+787,"describer: arms up
+",C,B
+788,"describer: praying monk
+",B,K
+789,"describer: sad man
+",F,E
+790,"describer: front kick
+",A,G
+791,"describer: crouching
+",L,F
+792,"matcher: last one! :)
+describer: kick back :-)
+",I,H
+3057,"matcher: hello
+describer: squatting and facing right
+",L,E
+3058,"describer: a bunny rabbit with triangle ears
+",E,I
+3059,"describer: a priest facing left holding a tablet
+",D,B
+3060,"describer: sitting facing left with knees up
+",F,E
+3061,"describer: standing on one foot, facing left, raised leg extended
+",I,B
+3062,"describer: sitting on knees (japanese style), facing right -but not squatting - you don't see the lower legs or any arms
+",H,F
+3063,"describer: sort of like an angel kneeling, facing right, with a triangle in her teeth
+",B,C
+3064,"describer: a ghost flying to the left with arms outstretched
+",C,C
+3065,"describer: kneeling, facing right, back very straight, holding a book or tablet
+describer: book, not book
+describer: you can ask questions, too
+",K,E
+3066,"describer: head on a pedestal - straight left side, sculpted right side
+matcher: there's so many rounds, i'm just going to go for what looks closest.
+describer: ok
+",J,C
+3067,"describer: shovelling show, facing left
+",G,C
+3068,"describer: a bear walking to the left, but looking behind him (one leg raised toward the left)
+",A,C
+3069,"describer: the same as last time - bear
+matcher: so i know bear and ghost (flying)) if that helps
+",A,The image the describer is trying to get the matcher to choose is **A**.
+3070,"describer: yoga - standing on one foot, facing left, raised leg extended
+",I,B
+3071,"matcher: okay so that's yoga
+describer: sitting, facing left, knees bent
+",F,E
+3072,"describer: 'kneeling presenter' - kneeling, facing right, way down on knees, head up, holding a tablet or something
+describer: tablet, not table
+",K,F
+3073,"describer: angel -  sort of like an angel kneeling, facing right, with a triangle in her teeth
+",B,B
+3074,"describer: bunny - with triangle ears
+",E,I
+3075,"describer: ghost
+",C,D
+3076,"describer: japanese - sitting, facing sort of forward/right, no arms, no lower legs
+",H,F
+3077,"describer: i called this shovelling snow last time - faces right, arm like they're pushing a shovel - sort of behind them, with a bunch of stuff lower right
+describer: i mean lower left...
+",G,C
+3078,"describer: priest - a priest, facing left, wearing robes, presenting a tablet or something
+",D,F
+3079,"describer: squatting - squatting, facing right, presenting a tablet
+",L,E
+3080,"describer: head on a pedestal - straight left side, angled right side - no arms
+",J,B
+3081,"matcher: call that vampire, i'll get it
+describer: priest - a priest, facing left, wearing robes, presenting a tablet or something
+describer: no - squatting!!!!
+describer: squatting - squatting, facing right, presenting a tablet
+",L,G
+3082,"describer: bunny - sorry about that last one
+matcher: its okay
+",E,G
+3083,"describer: 'kneeling presenter' - kneeling, facing right, way down on knees, head up, holding a tablet or something
+",K,F
+3084,"describer: head on a pedestal - straight left side, angled right side - no arms
+",J,B
+3085,"matcher: just call that vampire
+describer: yoga - standing on one foot, facing left, raised leg extended
+",I,C
+3086,"describer: angel -  sort of like an angel kneeling, facing right, with a triangle in her teeth
+",B,C
+3087,"describer: ghost
+",C,B
+3088,"describer: priest - a priest, facing left, wearing robes, presenting a tablet or something
+",D,F
+3089,"describer: japanese - sitting, facing sort of forward/right, no arms, no lower legs
+",H,F
+3090,"describer: bear
+",A,I
+3091,"describer: sitting, legs bent, facing left
+",F,E
+3092,"describer: shovelling snow
+",G,B
+3093,"describer: yoga
+",I,F
+3094,"describer: shovelling snow
+",G,E
+3095,"describer: bunny
+",E,E
+3096,"describer: sitting, legs bent, facing left
+",F,E
+3097,"describer: bear
+",A,I
+3098,"describer: japanese - sitting, facing sort of forward/right, no arms, no lower legs
+",H,F
+3099,"describer: 'kneeling presenter' - kneeling, facing right, way down on knees, head up, holding a tablet or something
+",K,F
+3100,"describer: head on a pedestal - straight left side, angled right side - no arms
+",J,B
+3101,"describer: angel
+",B,The image the describer is trying to get the matcher to choose is **C**.
+3102,"describer: squatting - squatting, facing right, presenting a tablet
+",L,E
+3103,"describer: priest - a priest, facing left, wearing robes, presenting a tablet or something
+",D,F
+3104,"describer: ghost
+",C,B
+3105,"describer: yoga
+",I,E
+3106,"describer: bear
+",A,E
+3107,"describer: japanese - sitting, facing sort of forward/right, no arms, no lower legs
+",H,F
+3108,"describer: head on a pedestal - straight left side, angled right side - no arms
+",J,C
+3109,"describer: angel
+",B,G
+3110,"describer: priest - a priest, facing left, wearing robes, presenting a tablet or something
+",D,F
+3111,"describer: sitting, legs bent, facing left
+",F,E
+3112,"describer: squatting - squatting, facing right, presenting a tablet
+",L,E
+3113,"describer: shovelling snow
+",G,B
+3114,"describer: ghost
+",C,B
+3115,"describer: 'kneeling presenter' - kneeling, facing right, way down on knees, head up, holding a tablet or something
+",K,F
+3116,"describer: bunny
+",E,E
+3117,"describer: ghost
+",C,D
+3118,"describer: bear
+",A,I
+3119,"describer: sitting, legs bent, facing left
+",F,E
+3120,"describer: 'kneeling presenter' - kneeling, facing right, way down on knees, head up, holding a tablet or something
+",K,F
+3121,"describer: angel
+",B,G
+3122,"describer: squatting - squatting, facing right, presenting a tablet
+",L,E
+3123,"describer: head on a pedestal
+",J,J
+3124,"describer: priest - a priest, facing left, wearing robes, presenting a tablet or something
+",D,F
+3125,"describer: yoga
+",I,E
+3126,"describer: bunny
+",E,E
+3127,"describer: japanese
+",H,D
+3128,"describer: shovelling snow - thanks! you're the best!
+matcher: good work :)
+",G,E
+4346,"describer: cayman facing right with diamond on his head.
+",K,C
+4347,"describer: facing left with leg raised in front of himself.
+",A,B
+6938,"matcher: hello
+",E,
+6939,"matcher: any clues?
+",L,"No, I need to see the messages between the describer and the matcher to provide a clue. Please provide the conversation so I can help you identify the correct image."
+6940,"matcher: hello?
+",J,I'm ready to play! Please provide the first message from the describer so I can start guessing the image.
+6941,"matcher: some help would be great!
+",G,
+6942,"matcher: what does it look like?
+",D,"I'm sorry, but I can't see the images you're referring to. Could you please provide more details or describe the image you're thinking of? This will help me assist you better."
+6943,"matcher: any information you'd like to share?
+",C,
+6944,"matcher: what does the shape look like?
+",B,
+6945,"matcher: is is the person that appears to be kneeling in prayer?
+",A,I
+6946,"matcher: let's try to do well
+",K,I need more information from the describer to make an accurate guess. Please provide the describer's message.
+6947,"matcher: hello?
+",F,I'm ready to play! Please provide the first message from the describer so I can start guessing the image.
+6948,"matcher: hello?
+",H,I'm ready to play! Please provide the first message from the describer so I can start guessing the image.
+6949,"matcher: hello?
+",I,I'm ready to play! Please provide the first message from the describer so I can start guessing the image.
+6950,"matcher: hello?
+",L,I'm ready to play! Please provide the first message from the describer so I can start guessing the image.
+6951,"matcher: right you there?
+",B,I cannot determine the intended image based on the provided message.
+6952,"matcher: i really want to do well
+",C,I cannot determine the target image at this point because there are no descriptive details provided by the describer.
+6953,"matcher: please participate
+",H,"Sure, please provide the messages from the describer so I can help determine which image they are trying to get the matcher to choose."
+6954,"matcher: please participate
+",A,"Sure, please provide the messages from the describer so I can help identify the image they are trying to get the matcher to choose."
+6955,"matcher: please participate
+",J,"Sure, please provide the messages from the describer so I can help determine which image they are trying to get the matcher to choose."
+7371,"matcher: hi
+matcher: ready when you are
+matcher: been waiting for 20 minutes now...
+matcher: now waiting 25 minutes, no one else here
+matcher: will wait 5 more minutes then submit with my id, thank you
+matcher: ok over 30 minutes now
+matcher: i tried to submit with my mturk id but that wont work
+",L,I cannot determine which image the describer is trying to get the matcher to choose based on the provided conversation.
+5157,"describer: pick the one that looks like a person on one leg
+",I,D
+5158,"describer: pick the one that has a diamond on top and a square-type shape on the left
+",D,B
+5159,"describer: the one that is sitting down, diamond head
+",F,G
+5160,"describer: the one that has a square in the top right, looks like its balancing on one foot
+",A,B
+5161,"describer: the one that has a diamond at top, and big blob, and points in the bottom right
+",H,C
+5162,"describer: a diamond on top, a straight line on the left
+",J,G
+5163,"describer: square on top left, 2 points on the right
+",G,C
+5164,"describer: the one that looks like it has bunny ears
+",E,A
+5165,"describer: a person who has both arms in the air
+",C,C
+5166,"describer: a person squatting with his hand out
+describer: on the right
+",L,G
+5167,"describer: 2 diamonds, 3 triangles,
+describer: 2 triangles point right
+",K,C
+5168,"describer: a square on top, a triangle to the bottom right of it, a blob on the bottom
+",B,C
+5169,"describer: a standing person with a diamond head and his arm out
+describer: hand outward to our left
+",D,C
+5170,"describer: one square, one triangle facing upper left, one triangle facing down
+",G,C
+5171,"describer: a diamond on top, straight line on left
+",J,E
+5172,"describer: this one looks like a figure skater with both arms pointing to our left
+describer: standing on one leg
+",I,A
+5173,"describer: this looks like a person squatting down, so 2 points on the right, looks like a bent knee
+",L,B
+5174,"describer: person with both arms out in the air
+",C,C
+5175,"describer: looks like a dinosaur with a flag
+describer: on one foot
+describer: square upper right
+",A,C
+5176,"describer: bunny ears
+",E,E
+5177,"describer: diamond on top, blob, looks like a persons body if theyre sitting down
+describer: 2 vertical lines
+describer: goes to the right at the bottom
+",H,C
+5178,"describer: looks like a diamond on top, diamond beneath it, 2 points on the right
+describer: looks like 2 diamonds and 3 triangles overlapping
+",K,C
+5179,"describer: square on top, triangle touching it to the bottom right of it
+describer: blob
+",B,C
+5180,"describer: looks like a person sitting on the floor looking down
+describer: bent knee
+",F,E
+5181,"matcher: my bad on that one
+describer: triangle, blob that looks like a person
+describer: like a portrait
+describer: goes to the right at the bottom
+",H,I
+5182,"describer: this looks like a person sitting down on a chair
+describer: triangle points right
+describer: knees bent to the right
+",L,F
+5183,"describer: bunny ears
+",E,I
+5184,"describer: diamond on top, straight line on left
+",J,E
+5185,"describer: person sat on the floor, looking down, knees bent, knee faces up
+",F,E
+5186,"describer: the square on the top tilts right, triangle touches it to the right
+describer: blob on bottom
+",B,B
+5187,"describer: square tilts left, one triangle points to it, one triangle points to the bottom
+describer: flat bottom
+",G,G
+5188,"describer: person with hands in the air
+",C,C
+5189,"describer: diamond head, person standing, their arm out to the left
+describer: square under arm
+",D,B
+5190,"describer: figure skater, both arms to the left
+describer: one leg
+",I,C
+5191,"describer: 2 diamonds on top of each other, 3 triangles overlap
+",K,Image G
+5192,"describer: dinosaur with a flag. square upper right.  one leg
+",A,C
+5193,"describer: looks like a person standing, diamond head, left arm
+",D,B
+5194,"matcher: that one makes me think of a magician holding a top hat
+describer: square tilts right, triangle on right touches it, blob on bottom
+describer: oh yeah it does
+",B,G
+5195,"describer: person squatting down onto chair, arm out on right
+describer: knee bent towards right
+matcher: triangle out of back or no?
+describer: no
+",L,G
+5196,"describer: dinosaur with flag on one leg
+",A,G
+5197,"describer: square upper left tilts left
+describer: bottom right triangle faces down
+describer: flat on bottom left
+",G,E
+5198,"describer: the figure skater, one leg, 2 arms on left
+",I,B
+5199,"describer: bunny ears
+",E,I
+5200,"describer: diamond on top, straight line on left
+",J,E
+5201,"describer: this is the one that i think looks like a person posing for portrait.  diamond on top, goes to the right at the bottom
+",H,D
+5202,"describer: 2 diamonds stacked, 3 triangles, overlapping
+",K,B
+5203,"describer: person with both arms in air
+",C,B
+5204,"describer: person sitting on the ground looking down
+describer: knee bent towards ceiling
+",F,F
+5205,"describer: the magician with/ top hat
+",D,J
+5206,"describer: bunny ears
+",E,E
+5207,"describer: square tilts left, 2 triangles, flat on bottom left
+",G,C
+5208,"describer: diamond on top, straight line on left
+",J,E
+5209,"describer: portrait person, diamond on top, goes to the right at the bottom
+",H,C
+5210,"describer: person with both arms waving in air
+",C,C
+5211,"describer: square tilts right, 2 triangles point towards it
+describer: triangle in bottom left corner
+",B,E
+5212,"describer: person sat on ground looking down knee bent towards ceiling
+",F,F
+5213,"describer: person squatting down, arm and knee point right
+matcher: diamond on back?
+describer: no
+",L,C
+5214,"describer: dinosaur with flag, one leg, square top right
+",A,B
+5215,"describer: 2 diamonds stacked, 3 triangles overlap
+",K,The image the describer is trying to get the matcher to choose is **G**.
+5216,"describer: figure skater, 2 arms left, standing on one leg
+",I,K
+5217,"describer: portrait person, diamond on top, goes to right at bottom
+",H,The image the describer is trying to get the matcher to choose is **D**.
+5218,"describer: diamond on top, straight line on left
+",J,E
+5219,"describer: 2 diamonds stacked, 3 triangles overlap
+",K,G
+5220,"describer: person squatting down, arm and knee to the right, straight back
+",L,C
+5221,"describer: person sat on ground, head down, knee bent towards ceiling
+",F,I
+5222,"describer: person with both arms in the air
+",C,C
+5223,"describer: dinosaur with flag, one leg, square upper right
+",A,H
+5224,"describer: square tilts left, 2 triangles on right, flat on bottom left
+",G,E
+5225,"describer: square tilts right, 2 triangles point towards it, triangle on the bottom left
+",B,E
+5226,"describer: figure skater, 2 arms left, on one leg
+",I,G
+5227,"describer: bunny ears
+",E,I
+5228,"describer: the magician
+",D,I
+73,"matcher: hi
+describer: looks sad with his head down kicking rocks
+describer: hello :)
+",A,C
+74,"describer: standing straight and sideways facing east
+describer: east
+",J,D
+75,"describer: woman kneeling and praying
+",K,F
+76,"describer: dancing a high energy dance kneeling with her arms in the air
+",G,B
+77,"describer: man who has an arrow like bottom facing east
+describer: has not as
+",L,H
+78,"describer: the last one you just picked
+",I,Insufficient information to determine the correct image.
+79,"describer: a person standing straight is with a triangle facing east maybe kneeling
+matcher: is the head shaped like a diamond in the middle of a horizontal line?
+describer: yes the head is a diamond sitting on a triangle look ghostly
+describer: ghostly
+",H,G
+80,"describer: woman praying in front of a mountain
+",B,I
+81,"describer: looks like a man falling backwards diamond head arms sprawled out
+",C,B
+82,"describer: a woman with big bow like thing on her head sitting
+",E,The image the describer is trying to get the matcher to choose is **C**.
+83,"describer: person standing straight facing west
+describer: with arms out
+",D,B
+84,"describer: man sitting facing west
+",F,F
+85,"describer: woman praying by the mountain
+",B,K
+86,"describer: woman with the bow
+",E,E
+87,"describer: lady with diamond head arms facing east kneeling sort of
+describer: one i said was dancing last time
+",G,C
+88,"describer: falling guy again diamond head
+",C,C
+89,"describer: the diamond head person who looks like they are squatting one i called arrow bottom
+",L,J
+90,"describer: dude that looks like doing yoga with legs in an upside left position
+describer: diamond head arms facing west
+",I,C
+91,"describer: sad guy
+",A,A
+92,"describer: kneeling lady one you picked the last time as the squatting
+describer: arms facing east
+",K,F
+93,"describer: guy that is sitting facing west
+",F,F
+94,"describer: man whose standing straight arms facing west
+",D,C
+95,"describer: the diamond head blob one, the diamond is sitting on top of a triangle, which is on top of square, then a tail is shape
+",H,G
+96,"matcher: that looked like a crooked tie
+describer: there ya go good name for that sorry couldnt explain it
+describer: man facing east standing straight
+",J,H
+97,"describer: one i said was squatting diamond head arms facing east
+",L,F
+98,"describer: sad guy
+",A,A
+99,"describer: falling guy
+",C,E
+100,"describer: woman with bow
+",E,K
+101,"describer: man straight arms are west
+",D,A
+102,"describer: lady with diamond head, arms west, in a crouch like position called her dancing before
+",G,B
+103,"describer: woman kneeling arms east
+describer: diamond head
+",K,F
+104,"describer: crooked tie
+",H,C
+105,"describer: straight man facing east
+",J,D
+106,"describer: sitting guy
+",F,F
+107,"describer: guy doing yoga
+",I,C
+108,"describer: praying mountain
+",B,B
+109,"describer: sad guy
+",A,A
+110,"describer: man who is arms facing east diamond head kneeling/squatting straight back
+",L,C
+111,"matcher: my bad
+describer: sorry bow lady
+",E,E
+112,"describer: sitting guy
+",F,F
+113,"describer: crooked tie
+",H,C
+114,"describer: falling guy
+",C,E
+115,"describer: straight arms west
+",D,A
+116,"describer: woman praying at the mountain
+",B,B
+117,"describer: yoga guy
+",I,A
+118,"describer: last lady you picked as praying
+describer: i keep calling her the dancing one
+describer: keep
+describer: diamond head
+describer: arms east
+describer: triangle between the legs
+",G,C
+119,"describer: straight facing east
+",J,D
+120,"describer: diamond head arms east, praying or accepting gifts or something
+",K,C
+121,"describer: falling guy
+",C,E
+122,"describer: one we keep getting wrong dancing lady
+describer: triangle in the legs white one
+",G,C
+123,"describer: sitting guy
+matcher: triangle in the legs threw me
+",F,E
+124,"describer: i suck at this , crooked tie
+",H,K
+125,"describer: lady praying mountain
+",B,I
+126,"describer: bow
+matcher: just need to say triangle leg from now on
+",E,H
+127,"describer: sad guy
+",A,A
+128,"describer: straight facing east
+",J,D
+129,"describer: yoga
+describer: yoga
+",I,F
+130,"describer: arms east triangle head, straight is back, look like a road arrow on his legs
+",L,The image the describer is trying to get the matcher to choose is **C**.
+131,"matcher: i got that guy as squatting
+describer: straight west
+",D,F
+132,"describer: okay gotcha
+describer: woman getting gifts
+",K,C
+133,"describer: dude straight facing east
+",J,C
+134,"describer: gift lady
+",K,F
+135,"describer: yoga
+",I,F
+136,"describer: sad
+",A,A
+137,"describer: falling
+",C,E
+138,"describer: mountain praying
+",B,C
+139,"describer: sitting guy
+",F,F
+140,"describer: triangle leg
+",G,E
+141,"describer: bow
+",E,G
+142,"describer: squatting
+",L,F
+143,"describer: facing east
+",D,C
+144,"describer: sorry crooked tie
+",H,B
+6578,"describer: ghost like
+describer: hands up
+matcher: is it leaning?
+describer: yes
+",C,B
+6579,"describer: sitting down with one leg forward
+describer: leg is on the left side
+matcher: foot visible?
+describer: yes. back is parallel to the right side of the box
+",F,F
+6580,"describer: looks like praying
+describer: arm on the right side of the box
+matcher: legs standing knees bent?
+describer: yes
+",L,I
+6581,"describer: head is on lest side and two hands in the air
+describer: kind of a horse
+describer: with two legs in air
+",G,C
+6582,"describer: head is a square attached to a triangle
+",B,"The describer is likely trying to get the matcher to choose image **B**, **E**, **G**, or **I**. Without additional details, any of these images could be the correct answer. If more context is provided, a more precise answer can be given."
+6583,"describer: kind of praying but one leg pointing up
+describer: square head
+",K,G
+6584,"describer: a hat thats point is pointing left
+matcher: right angle triangle on ground?
+describer: no
+describer: square head
+describer: back is straight
+describer: not sitting down
+",D,A
+6585,"describer: falling down
+",I,F
+6586,"describer: sitting down looking down square head
+",E,E
+6587,"describer: head tipping off horse like
+describer: off
+describer: one leg in the air
+matcher: repeat?
+matcher: facing left or right?
+matcher: hello?
+",A,B
+6588,"matcher: hello
+",J,
+6589,"matcher: is it one that looks like a seated woman back to the left, bow in hair?
+",H,The image the matcher is referring to is **G**.
+6590,"matcher: any help would be appreciated.
+",K,Please provide the messages from the describer so I can help you identify the image they are trying to get you to choose.
+6591,"describer: triangle head
+describer: one shoulder pointing towards right
+matcher: body shape?
+describer: one triangle leg
+describer: both on right side
+",J,G
+6592,"describer: very plain figure
+matcher: solid straight up?
+",H,J
+6593,"describer: hat pointing left
+describer: it was previously there
+describer: triangle head
+matcher: one arm to left?
+describer: yes
+",D,A
+6594,"describer: head with triangle attached
+",B,C
+6595,"describer: praying with bent legs
+",L,The image the describer is trying to get the matcher to choose is **B**.
+6596,"describer: one leg in the air
+describer: two arms on left
+describer: exercise position
+",I,B
+6597,"describer: sitting
+describer: one leg on left
+describer: back on right
+",F,F
+6598,"describer: horse like
+",G,K
+6599,"describer: flower head
+",E,I
+6600,"describer: ghost
+describer: flying
+",C,K
+6601,"describer: head tipping off
+describer: one leg in air left side
+",A,B
+6602,"describer: exercise
+",I,C
+6603,"describer: head with triangle attached
+",B,K
+6604,"describer: ghost
+",C,B
+6605,"describer: pray
+",L,I
+6606,"describer: pray with one leg folded
+",K,I
+6607,"describer: flower head
+",E,I
+6608,"describer: very plain
+describer: plain
+",H,A
+6609,"describer: sitting
+describer: sitting
+",F,F
+6610,"describer: hat
+describer: left
+",D,A
+6611,"describer: shoulder and leg on right side
+",J,H
+6612,"describer: head tipping right
+describer: gorilla
+",A,K
+6613,"describer: one leg in air lest horse
+describer: horse
+describer: horse
+",G,B
+6614,"describer: plain with two triangles
+describer: right side
+describer: shoulder on right side
+describer: pointing out
+",J,C
+6615,"describer: flower
+",E,I
+6616,"describer: praying bent leg
+describer: left side
+",K,B
+6617,"describer: horse
+",G,H
+6618,"describer: head with triangle
+",B,B
+6619,"describer: ghost
+",C,B
+6620,"describer: gorilla
+",A,C
+6621,"describer: exercise
+",I,"The image the describer is most likely trying to get the matcher to choose is **C** or **G**. However, if I had to pick one, I would choose **C** as it more clearly depicts a figure in a dynamic pose that resembles running or jumping, which is a common form of exercise."
+6622,"describer: plain
+",H,D
+6623,"describer: hat
+",D,J
+6624,"describer: sitting
+",F,F
+6625,"describer: sit praying
+describer: bent
+",L,B
+6626,"describer: sitting
+",F,F
+6627,"describer: praying with bent
+describer: legs
+matcher: no leg left side?
+describer: yes
+",L,E
+6628,"describer: horse
+",G,H
+6629,"describer: hat
+",D,J
+6630,"describer: plane
+",H,A
+6631,"describer: shoulder
+",J,F
+6632,"describer: ghost
+",C,B
+6633,"describer: gorilla
+",A,C
+6634,"describer: flower
+",E,I
+6635,"describer: praying leg left
+",K,E
