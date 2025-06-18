@@ -13,12 +13,14 @@ from PIL import Image
 from argparse import ArgumentParser
 
 def get_image_token(model_name):
-    if "Qwen" in model_name:
-        return "<image>"
-    elif "gemma" in model_name:
+    if "gemma" in model_name:
         return "<start_of_image>"
     elif "llama" in model_name:
         return "<|image|>"
+    elif "idefics" in model_name:
+        return "<image>"
+    elif "Qwen" in model_name:
+        return "<|vision_bos|><|image_pad|><|vision_eos|>"
     else:
         raise ValueError(f"Model {model_name} not supported")
 
@@ -53,7 +55,7 @@ def get_user_message(messages):
     return user_message
 
 
-def preprocess_messages(df_trials, df_messages):
+def preprocess_messages(df_trials, df_messages, include_history):
 
     df_messages = df_messages.sort_values(["trial_id", "message_number"])
     df_messages["info"] = df_messages.apply(
@@ -77,7 +79,7 @@ def preprocess_messages(df_trials, df_messages):
 
     df_trials["user_message"] = df_trials["messages"].apply(get_user_message)
     df_trials["label"] = df_trials["target"]
-    df_trials = df_trials[["user_message", "label"]]
+    df_trials = df_trials[["trial_id", "user_message", "label"]]
 
     df_trials = df_trials[df_trials["user_message"] != ""]
 
@@ -95,17 +97,18 @@ def main(args):
     df_trials = pd.read_csv(here(f"harmonized_data/{args.experiment_name}/trials.csv"))
     grid_image = Image.open(here("lm-performance/compiled_grid.png"))
 
-    df_trials = preprocess_messages(df_trials, df_messages)
-    df_trials = df_trials.sample(args.n_trials)
+    df_trials = preprocess_messages(df_trials, df_messages, args.include_history)
+    df_trials = df_trials.head(args.n_trials)
 
     llm = LLM(
         model=args.model,
         tokenizer=args.model,
-        max_model_len=8192,
+        max_model_len=16384,
         max_num_seqs=5,
         tensor_parallel_size=1,
         gpu_memory_utilization=0.95,
         dtype=torch.bfloat16,
+        guided_decoding_backend="xgrammar" if args.method == "direct" else "auto",
     )
 
     guided_decoding_params = GuidedDecodingParams(
@@ -162,7 +165,11 @@ def main(args):
         use_tqdm=True,
     )
     print(f"responses: {responses}")
-    model_choices = [extract_answer(response) for response in responses]
+    if args.method == "direct":
+        model_choices = [response.outputs[0].text for response in responses]
+    else:
+        model_choices = [extract_answer(response) for response in responses]
+    
     df_trials["model_choice"] = model_choices
 
     model_name = args.model.replace("/", "--")
@@ -179,6 +186,7 @@ if __name__ == "__main__":
     parser.add_argument("--experiment_name", type=str, default="hawkins2020_characterizing_cued")
     parser.add_argument("--n_trials", type=int, default=100)
     parser.add_argument("--method", type=str, default="cot")
+    parser.add_argument("--include_history", action="store_true")
     args = parser.parse_args()
 
     main(args)
