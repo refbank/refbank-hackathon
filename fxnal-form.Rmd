@@ -1,0 +1,171 @@
+---
+title: "Functional form"
+output:
+  html_document:
+    toc: true
+    df_print: paged
+---
+
+Copy me!
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F)
+library(tidyverse)
+library(here)
+library(ggplot2)
+library(stringi)
+library(lme4)
+library(lmerTest)
+library(broom)
+library(brms)
+library(bayestestR)
+
+theme_set(theme_bw())
+
+source(here("data_helpers.R"))
+DATA_LOC=here("harmonized_data")
+```
+
+
+# Get data
+
+```{r}
+STAGE_ONE_ONLY = TRUE # change this to include subsequent stages as well, for multi-stage datasets
+
+# options to get trials / choices / messages for all datasets
+all_dirs <- list.dirs(DATA_LOC, full.names = FALSE) |> 
+  stri_remove_empty()
+
+all_messages <- map(all_dirs, \(d) get_messages_full(DATA_LOC, d)) |> 
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_choices <- map(all_dirs, \(d) get_choices_full(DATA_LOC, d)) |>
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_trials <- map(all_dirs, \(d) get_trials_full(DATA_LOC, d)) |>
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+if (STAGE_ONE_ONLY) {
+  all_trials <- all_trials |> 
+    filter(stage_num == 1)
+  all_choices <- all_choices |> 
+    filter(stage_num == 1)
+  all_messages <- all_messages |> 
+    filter(stage_num == 1)
+}
+```
+
+
+```{r}
+rep_df <- all_messages |>
+  filter(role == "describer",
+         is.na(message_irrelevant) | !message_irrelevant,
+         !is.na(text)) |> 
+  group_by(paper_id, condition_id, game_id, trial_num, rep_num, target, 
+           group_size, structure, option_size, stage_num) |> 
+  summarise(total_num_words = sum(lengths(str_split(text, " ")), na.rm = TRUE), 
+            .groups = "drop_last") |> 
+  filter(!is.na(total_num_words))
+```
+
+```{r}
+mod_red <- lmer(log(total_num_words) ~ 
+                  rep_num * target * group_size * structure + 
+                  (rep_num * target | paper_id / game_id), 
+                data = rep_df,
+                control = lmerControl(optimizer = "bobyqa", 
+                                      optCtrl = list(maxfun = 1e5)))
+
+```
+
+```{r}
+
+priors <- c(set_prior("normal(0, 3)", class = "b"),
+            set_prior("normal(10,5)", class= "Intercept"),
+            set_prior("normal(0, 3)", class = "sd"),
+            set_prior("lkj(1)", class = "cor"))
+
+mod_brm_lin <- brm(total_num_words ~ 
+                 rep_num + trial_num + 
+                 (rep_num + trial_num | paper_id / condition_id / game_id) + 
+                 (rep_num + trial_num | target),
+               data = rep_df,
+               cores = 4,
+               file = "mod_brm_lin.rds",
+               prior = priors)
+```
+
+```{r}
+mod_brm_log <- brm(total_num_words ~ 
+                 log(rep_num) + log(trial_num) + 
+                 (log(rep_num) + log(trial_num) | paper_id / condition_id / game_id) + 
+                 (log(rep_num) + log(trial_num) | target),
+               data = rep_df,
+               cores = 4,
+               file = "mod_brm_log.rds",
+               prior = priors)
+
+```
+
+
+```{r}
+mod_brm_quad <- brm(total_num_words ~ 
+                 poly(rep_num, 2) + poly(trial_num, 2) + 
+                 (poly(rep_num, 2) + poly(trial_num, 2) | paper_id / condition_id / game_id) +
+                 (poly(rep_num, 2) + poly(trial_num, 2) | target),
+               data = rep_df,
+               cores = 4,
+               file = "mod_brm_quad.rds",
+               prior = priors)
+```
+
+```{r}
+loo_lin <- loo(mod_brm_lin)
+loo_log <- loo(mod_brm_log)
+loo_quad <- loo(mod_brm_quad)
+loo_compare(loo_lin, loo_log, loo_quad)
+```
+
+```{r}
+pred_nd <- tibble(
+  rep_num = 1:6,
+  trial_num = seq(6, 66, length.out = 6),
+)
+
+lin_preds <- fitted(mod_brm_lin, newdata = pred_nd, re_formula = NA) |> 
+  as_tibble(rownames = "rep_num") |> 
+  mutate(model = "linear")
+log_preds <- fitted(mod_brm_log, newdata = pred_nd, re_formula = NA) |>
+  as_tibble(rownames = "rep_num") |> 
+  mutate(model = "logarithmic")
+quad_preds <- fitted(mod_brm_quad, newdata = pred_nd, re_formula = NA) |>
+  as_tibble(rownames = "rep_num") |> 
+  mutate(model = "quadratic")
+
+all_preds <- bind_rows(lin_preds, log_preds, quad_preds)
+```
+
+```{r}
+ggplot(all_preds, aes(x = rep_num, y = Estimate, group = model)) +
+  geom_ribbon(aes(ymin = Q2.5, ymax = Q97.5, fill = model), alpha = 0.2) +
+  geom_line(aes(col = model)) +
+  labs(x = "Repetition number", 
+       y = "Predicted number of words",
+       col = "Model",
+       fill = "Model") +
+  theme_bw() +
+  theme(panel.grid = element_blank())
+```
+
