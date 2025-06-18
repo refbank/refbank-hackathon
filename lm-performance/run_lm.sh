@@ -24,7 +24,7 @@ MODEL_NAME="Qwen/Qwen2.5-VL-32B-Instruct"
 # MODEL_NAME="HuggingFaceM4/idefics2-8b"
 EXPERIMENT_NAME="hawkins2020_characterizing_cued"
 METHOD="direct"
-HISTORY_TYPE="yoked"
+HISTORY_TYPE="shuffled"
 
 python lm-performance/call_lm.py \
     --model $MODEL_NAME \

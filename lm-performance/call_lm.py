@@ -69,7 +69,6 @@ def preprocess_messages(row, history_type):
         if not isinstance(message_history_trunc, str):
             message_history = []
         else:
-            print(f"message_history_trunc: {message_history_trunc}")
             message_history = literal_eval(message_history_trunc.replace("nan", "''"))
 
         target_history = literal_eval(row["target_history_trunc"])
@@ -103,6 +102,7 @@ def main(args):
 
     # if we're shuffling histories, shuffle the histories
     if args.history_type == "shuffled":
+        print("shuffling histories")
         perm = np.random.permutation(len(df_with_history))
         df_with_history["message_history_trunc"] = df_with_history["message_history_trunc"].iloc[perm]
         df_with_history["target_history_trunc"] = df_with_history["target_history_trunc"].iloc[perm]
