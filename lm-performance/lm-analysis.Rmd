@@ -161,6 +161,6 @@ compare Human and Model Confusion Matrices using KL Divergence
 dpf_no_zero <- data_prop_full %>% mutate(prop = ifelse(prop == 0,1e-10,prop))
 hpf_no_zero <- human_prop_full %>% mutate(prop = ifelse(prop == 0,1e-10,prop))
 
-KL <- data_prop_full %>% group_by(model) %>% summarise(KL = sum(prop * log(prop /hpf_no_zero$prop)))
+KL <- dpf_no_zero %>% group_by(model) %>% summarise(KL = sum(prop * log(prop /hpf_no_zero$prop)))
 
 ```
