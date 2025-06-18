@@ -1,12 +1,11 @@
 ---
-title: "Template"
+title: "lm-analysis"
 output:
   html_document:
     toc: true
     df_print: paged
 ---
 
-Copy me!
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = F, message = F)
@@ -15,13 +14,14 @@ library(here)
 library(ggplot2)
 library(stringi)
 library(dplyr)
-library(plyr)
 
 theme_set(theme_bw())
 
 source(here("data_helpers.R"))
 DATA_LOC=here("harmonized_data")
 MODEL_LOC=here("lm-performance")
+
+library(plyr)
 ```
 
 
@@ -41,7 +41,7 @@ for (x in all_csvs) {
   data <- rbind.fill(this_csv, data)
 }
 
-data <- data %>% mutate(correct = (label == model_choice))
+data <- data %>% mutate(correct = (label == model_choice), model_choice = ifelse(grepl("Image",model_choice), strsplit(model_choice," ")[[1]][2], model_choice)) %>% mutate(model_choice = toupper(model_choice))
 
 detach(package:plyr)
 
@@ -50,5 +50,31 @@ detach(package:plyr)
 ```{r, eval=F}
 
 model_acc <- data %>% group_by(model) %>% summarise(n = n(), acc = mean(correct))
+
+```
+
+```{r}
+data_count <- data %>% group_by(model) %>% count(label, model_choice)
+
+data_prop <- data_count %>% group_by(model, label) %>% mutate(prop = n / sum(n)) %>% filter(nchar(model_choice) < 2)
+
+all_labels <- unique(data_prop$label)
+all_choices <- unique(data_prop$model_choice)
+
+data_prop_full <- data_prop %>% group_by(model) %>%
+  complete(label = all_labels, model_choice = all_choices, fill = list(n = 0, prop = 0))
+
+
+ggplot(data_prop_full, aes(x = model_choice, y = label)) +
+  geom_tile(aes(fill = prop), color = "white") +
+  #geom_text(aes(label = scales::percent(prop, accuracy = 1)), fontface = "bold") +
+  scale_fill_gradient(low = "white", high = "darkgreen") +
+  labs(
+    title = "Normalized Confusion Matrix",
+    x = "Predicted Label",
+    y = "Actual Label",
+    fill = "Proportion"
+  ) +
+  theme_minimal() + facet_wrap(~model)
 
 ```
