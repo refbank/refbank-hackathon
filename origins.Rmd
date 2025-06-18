@@ -17,67 +17,66 @@ library(stringi)
 theme_set(theme_bw())
 
 source(here("data_helpers.R"))
-DATA_LOC=here("harmonized_data")
+DATA_LOC <- here("harmonized_data")
 ```
 
 
 # Get data
 
 ```{r, eval=T}
-STAGE_ONE_ONLY = FALSE # change this to include subsequent stages as well, for multi-stage datasets
+STAGE_ONE_ONLY <- FALSE # change this to include subsequent stages as well, for multi-stage datasets
 
 # options to get trials / choices / messages for all datasets
-all_dirs <- list.dirs(DATA_LOC, full.names = FALSE) |> 
+all_dirs <- list.dirs(DATA_LOC, full.names = FALSE) |>
   stri_remove_empty()
 
-all_messages <- map(all_dirs, \(d) get_messages_full(DATA_LOC, d)) |> 
-  list_rbind() |> 
-  mutate(option_size = option_set |> 
-           str_split(";") |> 
-           lengths()) |> 
+all_messages <- map(all_dirs, \(d) get_messages_full(DATA_LOC, d)) |>
+  list_rbind() |>
+  mutate(option_size = option_set |>
+    str_split(";") |>
+    lengths()) |>
   filter(option_size != 1)
 
 all_choices <- map(all_dirs, \(d) get_choices_full(DATA_LOC, d)) |>
-  list_rbind() |> 
-  mutate(option_size = option_set |> 
-           str_split(";") |> 
-           lengths()) |> 
+  list_rbind() |>
+  mutate(option_size = option_set |>
+    str_split(";") |>
+    lengths()) |>
   filter(option_size != 1)
 
 all_trials <- map(all_dirs, \(d) get_trials_full(DATA_LOC, d)) |>
-  list_rbind() |> 
-  mutate(option_size = option_set |> 
-           str_split(";") |> 
-           lengths()) |> 
+  list_rbind() |>
+  mutate(option_size = option_set |>
+    str_split(";") |>
+    lengths()) |>
   filter(option_size != 1)
 
 if (STAGE_ONE_ONLY) {
-  all_trials <- all_trials |> 
+  all_trials <- all_trials |>
     filter(stage_num == 1)
-  all_choices <- all_choices |> 
+  all_choices <- all_choices |>
     filter(stage_num == 1)
-  all_messages <- all_messages |> 
+  all_messages <- all_messages |>
     filter(stage_num == 1)
 }
 ```
 
 ```{r, eval=F}
+# alternatively can get individual tables / experiments
 
-# alternatively can get individual tables / experiments 
+dataset <- "hawkins2021_respect"
 
-dataset="hawkins2021_respect"
-
-single_table <- get_tbl(dataset_name=dataset, tbl_name = "conditions") 
-#options are conditions, trials, messages, choices
+single_table <- get_tbl(dataset_name = dataset, tbl_name = "conditions")
+# options are conditions, trials, messages, choices
 
 # get trials + conditions
-full_trials <- get_trials_full(dataset_name=dataset)
+full_trials <- get_trials_full(dataset_name = dataset)
 
 # get messages + trials + conditions
-full_messages <- get_messages_full(dataset_name=dataset)
+full_messages <- get_messages_full(dataset_name = dataset)
 
 # get choices + trials + conditions
-full_choices <- get_choices_full(dataset_name=dataset)
+full_choices <- get_choices_full(dataset_name = dataset)
 ```
 
 Clean up decisions:
@@ -88,108 +87,113 @@ Clean up decisions:
 
 
 ```{r}
-
-clean_up_text <- function(text){
-  text |> str_to_lower() |> str_remove_all("[^a-z ]") |> str_squish()
+clean_up_text <- function(text) {
+  text |>
+    str_to_lower() |>
+    str_remove_all("[^a-z ]") |>
+    str_squish()
 }
 
-all_messages_clean <- all_messages |> 
-  filter(paper_id!="yoon2019_audience") |> 
+all_messages_clean <- all_messages |>
+  filter(paper_id != "yoon2019_audience") |>
   filter(!is.na(player_num)) |> # jank but expedient
-  mutate(text=ifelse(is.na(text), "", text)) |> 
-    mutate(game_id=case_when(
-    paper_id=="hawkins2021_respect"~str_sub(game_id, 1, -7),
-    paper_id=="hawkins2023_frompartners"~str_sub(game_id, 1, -3),
-    T ~ game_id),
+  mutate(text = ifelse(is.na(text), "", text)) |>
+  mutate(
+    game_id = case_when(
+      paper_id == "hawkins2021_respect" ~ str_sub(game_id, 1, -7),
+      paper_id == "hawkins2023_frompartners" ~ str_sub(game_id, 1, -3),
+      T ~ game_id
+    ),
     last_rep = case_when(
-      paper_id=="eliav2023_semantic" ~ 5,
-      structure=="network-swap" ~ 12,
-      T ~ 6)
+      paper_id == "eliav2023_semantic" ~ 5,
+      structure == "network-swap" ~ 12,
+      T ~ 6
     )
+  )
 
-end <- all_messages_clean |> 
-  filter(role=="describer") |> 
-  filter(rep_num==last_rep) |> 
-  group_by(game_id, target, rep_num, paper_id, structure, group_size, conv_desc=player_num) |> 
-  summarize(convention=str_c(text, sep=" ", collapse=" ")) |> 
-  mutate(convention=clean_up_text(convention)) |> 
-  filter(!convention=="") |> 
-  ungroup() |> 
+end <- all_messages_clean |>
+  filter(role == "describer") |>
+  filter(rep_num == last_rep) |>
+  group_by(game_id, target, rep_num, paper_id, structure, group_size, conv_desc = player_num) |>
+  summarize(convention = str_c(text, sep = " ", collapse = " ")) |>
+  mutate(convention = clean_up_text(convention)) |>
+  filter(!convention == "") |>
+  ungroup() |>
   select(-rep_num)
-  
 ```
 
 ```{r}
-earlier <- all_messages_clean |> 
+earlier <- all_messages_clean |>
   select(game_id, target, stage_num, trial_num, rep_num, text, role, player_num, structure, paper_id, group_size) |>
-  mutate(text=clean_up_text(text)) |> 
-  left_join(end, by=c("game_id", "target", "paper_id", "structure", "group_size")) |> 
-  filter(!is.na(convention)) |> 
-  mutate(base_regex = str_detect(text, convention) |> as.numeric()) |> 
-  rowwise() |> 
-  mutate( fuzzy_regex = agrepl(convention, text) |> as.numeric())
+  mutate(text = clean_up_text(text)) |>
+  left_join(end, by = c("game_id", "target", "paper_id", "structure", "group_size")) |>
+  filter(!is.na(convention)) |>
+  mutate(base_regex = str_detect(text, convention) |> as.numeric()) |>
+  rowwise() |>
+  mutate(fuzzy_regex = agrepl(convention, text) |> as.numeric())
 
-earlier_concat <- all_messages_clean |> 
-  select(game_id, player_num, target, stage_num, rep_num, trial_num, paper_id, role, text, structure, group_size) |> 
-group_by(game_id, player_num, target, stage_num, rep_num, trial_num, paper_id, role, structure, group_size) |>  
-  summarize(text=str_c(text, sep=" ", collapse=" ")) |> 
-              mutate(text=clean_up_text(text)) |> 
-  left_join(end, by=c("game_id", "target", "paper_id", "structure", "group_size")) |> 
-  filter(!is.na(convention)) |> 
-  mutate(base_regex = str_detect(text, convention) |> as.numeric()) |> 
-  rowwise() |> 
-  mutate(fuzzy_regex=agrepl(convention, text) |> as.numeric())
+earlier_concat <- all_messages_clean |>
+  select(game_id, player_num, target, stage_num, rep_num, trial_num, paper_id, role, text, structure, group_size) |>
+  group_by(game_id, player_num, target, stage_num, rep_num, trial_num, paper_id, role, structure, group_size) |>
+  summarize(text = str_c(text, sep = " ", collapse = " ")) |>
+  mutate(text = clean_up_text(text)) |>
+  left_join(end, by = c("game_id", "target", "paper_id", "structure", "group_size")) |>
+  filter(!is.na(convention)) |>
+  mutate(base_regex = str_detect(text, convention) |> as.numeric()) |>
+  rowwise() |>
+  mutate(fuzzy_regex = agrepl(convention, text) |> as.numeric())
 ```
 
 ```{r}
 # earliest trial
 
-earliest_describer_fuzzy <- earlier_concat |> filter(role=="describer") |> 
-  group_by(game_id, target, paper_id, structure, group_size) |> 
-  filter(fuzzy_regex==1) |> 
-  slice_min(order_by=rep_num)
+earliest_describer_fuzzy <- earlier_concat |>
+  filter(role == "describer") |>
+  group_by(game_id, target, paper_id, structure, group_size) |>
+  filter(fuzzy_regex == 1) |>
+  slice_min(order_by = rep_num)
 
-earliest_describer_base <- earlier_concat |> filter(role=="describer") |> 
-  group_by(game_id, target, paper_id, structure, group_size) |> 
-  filter(base_regex==1) |> 
-  slice_min(order_by=rep_num)
+earliest_describer_base <- earlier_concat |>
+  filter(role == "describer") |>
+  group_by(game_id, target, paper_id, structure, group_size) |>
+  filter(base_regex == 1) |>
+  slice_min(order_by = rep_num)
 
 earliest_any_fuzzy <- earlier_concat |>
-  group_by(game_id, target, paper_id, structure, group_size) |> 
-  filter(fuzzy_regex==1) |> 
-  slice_min(order_by=rep_num)
+  group_by(game_id, target, paper_id, structure, group_size) |>
+  filter(fuzzy_regex == 1) |>
+  slice_min(order_by = rep_num)
 
 earliest_any_base <- earlier_concat |>
-  group_by(game_id, target, paper_id, structure, group_size) |> 
-  filter(base_regex==1) |> 
-  slice_min(order_by=rep_num)
-  
+  group_by(game_id, target, paper_id, structure, group_size) |>
+  filter(base_regex == 1) |>
+  slice_min(order_by = rep_num)
 ```
 
 ```{r}
 # survival trial
 
-survival_describer_fuzzy <- earlier_concat |> filter(role=="describer") |> 
-  group_by(game_id, target, paper_id, structure, group_size) |> 
-  mutate(occurred = fuzzy_regex) |> 
-  arrange(rep_num) |> 
-  fill(occurred) 
+survival_describer_fuzzy <- earlier_concat |>
+  filter(role == "describer") |>
+  group_by(game_id, target, paper_id, structure, group_size) |>
+  mutate(occurred = fuzzy_regex) |>
+  arrange(rep_num) |>
+  fill(occurred)
 
-# earliest_describer_base <- earlier_concat |> filter(role=="describer") |> 
-#   group_by(game_id, target, paper_id, structure, group_size) |> 
-#   filter(base_regex==1) |> 
+# earliest_describer_base <- earlier_concat |> filter(role=="describer") |>
+#   group_by(game_id, target, paper_id, structure, group_size) |>
+#   filter(base_regex==1) |>
 #   slice_min(order_by=rep_num)
-# 
+#
 # earliest_any_fuzzy <- earlier_concat |>
-#   group_by(game_id, target, paper_id, structure, group_size) |> 
-#   filter(fuzzy_regex==1) |> 
+#   group_by(game_id, target, paper_id, structure, group_size) |>
+#   filter(fuzzy_regex==1) |>
 #   slice_min(order_by=rep_num)
-# 
+#
 # earliest_any_base <- earlier_concat |>
-#   group_by(game_id, target, paper_id, structure, group_size) |> 
-#   filter(base_regex==1) |> 
+#   group_by(game_id, target, paper_id, structure, group_size) |>
+#   filter(base_regex==1) |>
 #   slice_min(order_by=rep_num)
-  
 ```
 
 # Plots
@@ -199,24 +203,26 @@ survival_describer_fuzzy <- earlier_concat |> filter(role=="describer") |>
 base regex 
 
 ```{r}
+earlier_concat |>
+  filter(role == "describer") |>
+  group_by(structure, group_size) |>
+  mutate(frac = rep_num / max(rep_num)) |>
+  mutate(same = conv_desc == player_num) |>
+  ggplot(aes(x = frac, y = base_regex, color = str_c(structure, group_size))) +
+  coord_cartesian(ylim = c(0, 1)) +
+  stat_summary(aes(group = game_id), geom = "point", alpha = .1, position = position_jitter(width = .1, height = .1)) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"))
 
-earlier_concat |>filter(role=="describer") |> 
-  group_by(structure, group_size) |> 
-  mutate(frac=rep_num/max(rep_num)) |> 
-  mutate(same=conv_desc==player_num) |> 
-  ggplot(aes(x=frac, y=base_regex, color=str_c(structure, group_size)))+
-  coord_cartesian(ylim=c(0,1))+
-  stat_summary(aes(group=game_id), geom="point", alpha=.1, position=position_jitter(width=.1, height=.1))+
-  geom_smooth(method="glm", method.args = list(family="binomial"))
+earlier_concat |>
+  filter(role == "describer") |>
+  group_by(structure, group_size) |>
+  mutate(frac = rep_num / max(rep_num)) |>
+  mutate(same = conv_desc == player_num) |>
+  ggplot(aes(x = frac, y = base_regex, color = str_c(structure, group_size))) +
+  coord_cartesian(ylim = c(0, 1)) +
+  stat_summary(aes(group = game_id), geom = "point", alpha = .1, position = position_jitter(width = .1, height = .1)) +
+  stat_summary(geom = "line", size=1)
 
-earlier_concat |>filter(role=="describer") |> 
-  group_by(structure, group_size) |> 
-  mutate(frac=rep_num/max(rep_num)) |> 
-    mutate(same=conv_desc==player_num) |> 
-  ggplot(aes(x=frac, y=base_regex, color=str_c(structure, group_size)))+
-  coord_cartesian(ylim=c(0,1))+
-  stat_summary(aes(group=game_id), geom="point", alpha=.1, position=position_jitter(width=.1, height=.1))+
-    stat_summary(geom="line")
 
 
 ```
@@ -224,54 +230,72 @@ earlier_concat |>filter(role=="describer") |>
 fuzzy regex
 
 ```{r}
+earlier_concat |>
+  filter(role == "describer") |>
+  group_by(structure, group_size) |>
+  mutate(frac = rep_num / max(rep_num)) |>
+  mutate(same = conv_desc == player_num) |>
+  ggplot(aes(x = frac, y = fuzzy_regex, color = str_c(structure, group_size))) +
+  coord_cartesian(ylim = c(0, 1)) +
+  stat_summary(aes(group = game_id), geom = "point", alpha = .1, position = position_jitter(width = .1, height = .1)) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"))
 
-earlier_concat |>filter(role=="describer") |> 
-  group_by(structure, group_size) |> 
-  mutate(frac=rep_num/max(rep_num)) |> 
-  mutate(same=conv_desc==player_num) |> 
-  ggplot(aes(x=frac, y=fuzzy_regex, color=str_c(structure, group_size)))+
-  coord_cartesian(ylim=c(0,1))+
-  stat_summary(aes(group=game_id), geom="point", alpha=.1, position=position_jitter(width=.1, height=.1))+
-  geom_smooth(method="glm", method.args = list(family="binomial"))
+earlier_concat |>
+  filter(role == "describer") |>
+  group_by(structure, group_size) |>
+  mutate(frac = rep_num / max(rep_num)) |>
+  mutate(same = conv_desc == player_num) |>
+  ggplot(aes(x = frac, y = fuzzy_regex, color = str_c(structure, group_size))) +
+  coord_cartesian(ylim = c(0, 1)) +
+  stat_summary(aes(group = game_id), geom = "point", alpha = .1, position = position_jitter(width = .1, height = .1)) +
+  stat_summary(geom = "line", size=1)
 
-earlier_concat |>filter(role=="describer") |> 
-  group_by(structure, group_size) |> 
-  mutate(frac=rep_num/max(rep_num)) |> 
-    mutate(same=conv_desc==player_num) |> 
-  ggplot(aes(x=frac, y=fuzzy_regex, color=str_c(structure, group_size)))+
-  coord_cartesian(ylim=c(0,1))+
-  stat_summary(aes(group=game_id), geom="point", alpha=.1, position=position_jitter(width=.1, height=.1))+
-    stat_summary(geom="line")
-
-
+earlier_concat |>
+  filter(role == "describer") |>
+  group_by(structure, group_size) |>
+  mutate(frac = rep_num / max(rep_num)) |>
+  mutate(same = conv_desc == player_num) |>
+  filter(target %in% c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L")) |> 
+  ggplot(aes(x = frac, y = fuzzy_regex, color = target)) +
+  coord_cartesian(ylim = c(0, 1)) +
+  stat_summary(aes(group = target), geom = "point", alpha = .5, position = position_jitter(width = .1, height = .1)) +
+    geom_smooth(method = "glm", method.args = list(family = "binomial"))
 ```
 
 ## First
 
 base regex 
 
-```{r}
+```{r, fig.width=10, fig.height=2}
+earliest_any_base |>
+  mutate(first = ifelse(rep_num > 6, "7+", rep_num |> as.character())) |>
+  ggplot(aes(x = group_size, group = rep_num, fill = as.factor(first))) +
+  geom_bar(position = "fill", stat = "count") +
+  facet_grid(.~structure)+
+  scale_fill_brewer(palette="Dark2")
 
 
+earliest_any_fuzzy |>
+  mutate(first = ifelse(rep_num > 6, "7+", rep_num |> as.character())) |>
+  ggplot(aes(x = group_size, group = rep_num, fill = as.factor(first))) +
+  geom_bar(position = "fill", stat = "count") +
+  facet_grid(.~structure)+
+  scale_fill_brewer(palette="Dark2")
 
-earliest_describer_base |> mutate(first=ifelse(rep_num>6, "7+", rep_num |> as.character()))  |> 
-  ggplot(aes(x=group_size, group=rep_num, fill=as.factor(first)))+geom_bar(position="fill", stat="count")+facet_wrap(~structure)
-
-
-# earliest_any_fuzzy |> mutate(first=ifelse(rep_num>6, "7+", rep_num |> as.character()))  |> 
+# earliest_any_fuzzy |> mutate(first=ifelse(rep_num>6, "7+", rep_num |> as.character()))  |>
 #   ggplot(aes(x=group_size, group=rep_num, fill=as.factor(first)))+geom_bar(position="fill", stat="count")+facet_wrap(~structure)
-# 
-# 
-# earliest_any_base |> mutate(first=ifelse(rep_num>6, "7+", rep_num |> as.character()))  |> 
+#
+#
+# earliest_any_base |> mutate(first=ifelse(rep_num>6, "7+", rep_num |> as.character()))  |>
 #   ggplot(aes(x=group_size, group=rep_num, fill=as.factor(first)))+geom_bar(position="fill", stat="count")+facet_wrap(~structure)
-
 ```
 
 fuzzy 
 
 ```{r}
-earliest_describer_fuzzy |> mutate(first=ifelse(rep_num>6, "7+", rep_num |> as.character()))  |> 
-  ggplot(aes(x=group_size, group=rep_num, fill=as.factor(first)))+geom_bar(position="fill", stat="count")+facet_wrap(~structure)
-
+earliest_describer_fuzzy |>
+  mutate(first = ifelse(rep_num > 6, "7+", rep_num |> as.character())) |>
+  ggplot(aes(x = group_size, group = rep_num, fill = as.factor(first))) +
+  geom_bar(position = "fill", stat = "count") +
+  facet_wrap(~structure)
 ```
-
