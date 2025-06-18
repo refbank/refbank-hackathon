@@ -25,7 +25,7 @@ library(plyr)
 ```
 
 
-# Get data
+# Get  lm data
 
 ```{r, eval=F}
 
@@ -41,22 +41,30 @@ for (x in all_csvs) {
   data <- rbind.fill(this_csv, data)
 }
 
-data <- data %>% mutate(correct = (label == model_choice), model_choice = ifelse(grepl("Image",model_choice), strsplit(model_choice," ")[[1]][2], model_choice)) %>% mutate(model_choice = toupper(model_choice))
+data <- data %>% mutate(label = ifelse(is.na(target),label,target)) %>% mutate(correct = (label == model_choice), model_choice = ifelse(grepl("Image",model_choice), strsplit(model_choice," ")[[1]][2], model_choice)) %>% mutate(model_choice = toupper(model_choice))
+
+data_history <- data %>% filter(model == "model_choices-Qwen--Qwen2.5-VL-32B-Instruct-hawkins2020_characterizing_cued-direct-history.csv")
 
 detach(package:plyr)
 
 ```
 
+#get model accuracies
+
 ```{r, eval=F}
 
 model_acc <- data %>% group_by(model) %>% summarise(n = n(), acc = mean(correct))
 
+trial_one_acc <- data %>% filter(trial_num == 1) %>% group_by(model) %>% summarise(n = n(), acc = mean(correct))
+
 ```
+
+# get confusion matrix 
 
 ```{r}
 data_count <- data %>% group_by(model) %>% count(label, model_choice)
 
-data_prop <- data_count %>% group_by(model, label) %>% mutate(prop = n / sum(n)) %>% filter(nchar(model_choice) < 2)
+data_prop <- data_count %>% group_by(model, label) %>% mutate(prop = n / sum(n)) %>% filter(nchar(model_choice) == 1)
 
 all_labels <- unique(data_prop$label)
 all_choices <- unique(data_prop$model_choice)
@@ -76,5 +84,83 @@ ggplot(data_prop_full, aes(x = model_choice, y = label)) +
     fill = "Proportion"
   ) +
   theme_minimal() + facet_wrap(~model)
+
+```
+
+# Get human data
+
+```{r}
+
+STAGE_ONE_ONLY = TRUE # change this to include subsequent stages as well, for multi-stage datasets
+
+dataset="hawkins2020_characterizing_cued"
+
+single_table <- get_tbl(dataset_name=dataset, tbl_name = "conditions") 
+#options are conditions, trials, messages, choices
+
+# get trials + conditions
+full_trials <- get_trials_full(dataset_name=dataset)
+
+# get messages + trials + conditions
+full_messages <- get_messages_full(dataset_name=dataset)
+
+# get choices + trials + conditions
+full_choices <- get_choices_full(dataset_name=dataset)
+
+if (STAGE_ONE_ONLY) {
+  full_trials <- full_trials |> 
+    filter(stage_num == 1)
+  full_choices <- full_choices |> 
+    filter(stage_num == 1)
+  full_messages <- full_messages |> 
+    filter(stage_num == 1)
+}
+
+full_choices <- full_choices %>% mutate(correct = (target == choice_id)) %>% filter(is.na(exclude))
+
+```
+
+# get human acc
+
+```{r}
+
+human_acc <- full_choices %>% summarise(n = n(), acc = mean(correct))
+
+```
+
+# human confusion matrix 
+```{r}
+human_count <- full_choices %>% count(target, choice_id) %>% filter(!is.na(choice_id))
+
+human_prop <- human_count %>% mutate(prop = n / sum(n))
+
+human_labels <- unique(human_prop$target)
+human_choices <- unique(human_prop$choice_id)
+
+human_prop_full <- human_prop %>% complete(target = human_labels, choice_id = human_choices, fill = list(n = 0, prop = 0))
+
+
+ggplot(human_prop_full, aes(x = choice_id, y = target)) +
+  geom_tile(aes(fill = prop), color = "white") +
+  #geom_text(aes(label = scales::percent(prop, accuracy = 1)), fontface = "bold") +
+  scale_fill_gradient(low = "white", high = "darkgreen") +
+  labs(
+    title = "Normalized Confusion Matrix",
+    x = "Chosen Label",
+    y = "Actual Label",
+    fill = "Proportion"
+  ) +
+  theme_minimal()
+
+```
+
+compare Human and Model Confusion Matrices using KL Divergence 
+
+```{r}
+
+dpf_no_zero <- data_prop_full %>% mutate(prop = ifelse(prop == 0,1e-10,prop))
+hpf_no_zero <- human_prop_full %>% mutate(prop = ifelse(prop == 0,1e-10,prop))
+
+KL <- data_prop_full %>% group_by(model) %>% summarise(KL = sum(prop * log(prop /hpf_no_zero$prop)))
 
 ```
