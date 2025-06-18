@@ -12,6 +12,7 @@ from pyprojroot import here
 from PIL import Image
 from argparse import ArgumentParser
 
+
 def get_image_token(model_name):
     if "Qwen" in model_name:
         return "<image>"
@@ -22,12 +23,15 @@ def get_image_token(model_name):
     else:
         raise ValueError(f"Model {model_name} not supported")
 
+
 def extract_answer(response):
     """
     Extract the answer from the response.
     """
     try:
-        return response.outputs[0].text.split("<answer>")[1].split("</answer>")[0].strip()
+        return (
+            response.outputs[0].text.split("<answer>")[1].split("</answer>")[0].strip()
+        )
     except IndexError:
         return ""
 
@@ -89,9 +93,12 @@ SYSTEM_PROMPT = """You will be presented with a list of messages between people 
 Think step by step before your answer, with your reasoning contained in <think></think> tags. Then respond with your answer in <answer></answer> tags.
 """
 
+
 def main(args):
 
-    df_messages = pd.read_csv(here(f"harmonized_data/{args.experiment_name}/messages.csv"))
+    df_messages = pd.read_csv(
+        here(f"harmonized_data/{args.experiment_name}/messages.csv")
+    )
     df_trials = pd.read_csv(here(f"harmonized_data/{args.experiment_name}/trials.csv"))
     grid_image = Image.open(here("lm-performance/compiled_grid.png"))
 
@@ -125,7 +132,6 @@ def main(args):
             guided_decoding=guided_decoding_params,
         )
 
-
     elif args.method == "cot":
 
         system_prompt = """You will be presented with a list of messages between people playing a reference game, where the describer has to get the matcher to choose an image from a list of images. Your goal is to guess which of the images the describer is trying to get the matcher to choose. The images, with their labels, are shown in the image.
@@ -144,17 +150,21 @@ def main(args):
 
     prompts = []
     for user_message in df_trials["user_message"]:
-        chat = [
+        chat = (
+            [
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": get_image_token(args.model) + user_message}
+                {"role": "user", "content": get_image_token(args.model) + user_message},
             ],
+        )
         prompt = tokenizer.apply_chat_template(
             chat, add_generation_prompt=True, tokenize=False
         )[0]
-        prompts.append({
-            "prompt": prompt,
-            "multi_modal_data": {"image": grid_image},
-        })
+        prompts.append(
+            {
+                "prompt": prompt,
+                "multi_modal_data": {"image": grid_image},
+            }
+        )
 
     responses = llm.generate(
         prompts,
@@ -166,17 +176,23 @@ def main(args):
     df_trials["model_choice"] = model_choices
 
     model_name = args.model.replace("/", "--")
-    df_trials.to_csv(here(f"lm-performance/results/model_choices-{model_name}-{args.experiment_name}-{args.method}.csv"), index=False)
+    df_trials.to_csv(
+        here(
+            f"lm-performance/results/model_choices-{model_name}-{args.experiment_name}-{args.method}.csv"
+        ),
+        index=False,
+    )
 
     accuracy = compute_accuracy(model_choices, df_trials["label"])
     print(f"Model accuracy: {accuracy}")
 
 
-
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--model", type=str, default="google/gemma-3-4b-it")
-    parser.add_argument("--experiment_name", type=str, default="hawkins2020_characterizing_cued")
+    parser.add_argument(
+        "--experiment_name", type=str, default="hawkins2020_characterizing_cued"
+    )
     parser.add_argument("--n_trials", type=int, default=100)
     parser.add_argument("--method", type=str, default="cot")
     args = parser.parse_args()
