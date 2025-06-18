@@ -64,7 +64,7 @@ trial_one_acc <- data %>% filter(trial_num == 1) %>% group_by(model) %>% summari
 ```{r}
 data_count <- data %>% group_by(model) %>% count(label, model_choice)
 
-data_prop <- data_count %>% group_by(model, label) %>% mutate(prop = n / sum(n)) %>% filter(nchar(model_choice) == 1)
+data_prop <- data_count %>% group_by(model) %>% mutate(prop = n / sum(n)) %>% filter(nchar(model_choice) == 1)
 
 all_labels <- unique(data_prop$label)
 all_choices <- unique(data_prop$model_choice)
@@ -161,6 +161,6 @@ compare Human and Model Confusion Matrices using KL Divergence
 dpf_no_zero <- data_prop_full %>% mutate(prop = ifelse(prop == 0,1e-10,prop))
 hpf_no_zero <- human_prop_full %>% mutate(prop = ifelse(prop == 0,1e-10,prop))
 
-KL <- dpf_no_zero %>% group_by(model) %>% summarise(KL = sum(prop * log(prop /hpf_no_zero$prop)))
+KL <- dpf_no_zero %>% group_by(model) %>% summarise(KL = sum(hpf_no_zero$prop * log(hpf_no_zero$prop/prop)))
 
 ```
