@@ -12,6 +12,7 @@ library(here)
 library(ggplot2)
 library(stringi)
 library(lme4)
+library(lmerTest)
 library(glue)
 
 theme_set(theme_bw() +
@@ -103,8 +104,8 @@ all_embeds_conc |>
        y = "Predicted concreteness values")
 ```
 
-
-
-
-
+```{r}
+mod_res <- lmer(concreteness_pred ~ rep_num * group_size * structure + (1 | paper_id / game_id),
+                 data = all_embeds_conc)
+```
 
