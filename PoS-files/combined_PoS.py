@@ -10,7 +10,7 @@ nlp = spacy.load("en_core_web_sm")
 tqdm.pandas()
 
 # SET DATASET NAME HERE
-dataset_name = "hawkins2019_continual" 
+dataset_name = "leung2024_scaffolding" 
 
 # File paths
 message_path = f"harmonized_data/{dataset_name}/messages.csv"

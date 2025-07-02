@@ -11,8 +11,9 @@ dataset_paths = [
     "harmonized_data/hawkins2020_characterizing_cued",
     "harmonized_data/hawkins2020_characterizing_uncued",
     "harmonized_data/hawkins2021_respect",
-    "harmonized_data/hawkins2023_frompartners"
-
+    "harmonized_data/hawkins2023_frompartners",
+    "harmonized_data/leung2024_scaffolding",
+    "harmonized_data/mankewitz2025_compositional"
 ]
 
 # Define hedge words
