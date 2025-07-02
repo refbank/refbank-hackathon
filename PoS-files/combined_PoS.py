@@ -48,7 +48,6 @@ nominal_df = df.groupby("rep_num")["prop_nominal"].mean().reset_index()
 nominal_df["metric"] = "Nominal Proportion"
 nominal_df = nominal_df.rename(columns={"prop_nominal": "value"})
 
-# ------------------------------
 # Hedge count
 hedge_words = {
     "maybe", "perhaps", "probably", "possibly", "seems", "i think", "i guess",
@@ -64,7 +63,6 @@ hedge_df = df.groupby("rep_num")["hedge_count"].mean().reset_index()
 hedge_df["metric"] = "Hedge Count"
 hedge_df = hedge_df.rename(columns={"hedge_count": "value"})
 
-# ------------------------------
 # Combine and Plot
 combined_df = pd.concat([pronoun_df, nominal_df, hedge_df], ignore_index=True)
 

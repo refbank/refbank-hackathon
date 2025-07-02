@@ -51,7 +51,7 @@ def extract_mod_features(text):
 mod_features = df["text"].apply(extract_mod_features).apply(pd.Series)
 df = pd.concat([df, mod_features], axis=1)
 
-# === Aggregate and reshape for plotting ===
+# Aggregate and reshape for plotting 
 features_to_plot = ["num_adjectives", "num_noun_chunks", "avg_np_len", "num_modifiers", "num_preps"]
 summary_df = df.groupby("rep_num")[features_to_plot].mean().reset_index()
 
