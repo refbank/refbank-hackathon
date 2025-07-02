@@ -1,0 +1,110 @@
+---
+title: "Concreteness"
+author: "Alvin Tan"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+knitr::opts_chunk$set(echo = F, message = F)
+library(tidyverse)
+library(here)
+library(ggplot2)
+library(stringi)
+library(lme4)
+library(glue)
+
+theme_set(theme_bw() +
+            theme(panel.grid.minor = element_blank(),
+                  panel.grid.major = element_blank()))
+
+source(here("data_helpers.R"))
+DATA_LOC = here("harmonized_data")
+```
+
+```{r}
+STAGE_ONE_ONLY = TRUE # change this to include subsequent stages as well, for multi-stage datasets
+
+# options to get trials / choices / messages for all datasets
+all_dirs <- list.dirs(DATA_LOC, full.names = FALSE) |> 
+  stri_remove_empty()
+
+all_messages <- map(all_dirs, \(d) get_messages_full(DATA_LOC, d)) |> 
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_choices <- map(all_dirs, \(d) get_choices_full(DATA_LOC, d)) |>
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_trials <- map(all_dirs, \(d) get_trials_full(DATA_LOC, d)) |>
+  list_rbind() |> 
+  mutate(option_size = option_set |> 
+           str_split(";") |> 
+           lengths()) |> 
+  filter(option_size != 1)
+
+all_embeds <- map(all_dirs, \(d) get_tbl(DATA_LOC, d, "embeddings")) |>
+  list_rbind() |> 
+  left_join(all_trials, by = join_by(paper_id, game_id, trial_id))
+
+if (STAGE_ONE_ONLY) {
+  all_trials <- all_trials |> 
+    filter(stage_num == 1)
+  all_choices <- all_choices |> 
+    filter(stage_num == 1)
+  all_messages <- all_messages |> 
+    filter(stage_num == 1)
+  all_embeds <- all_embeds |> 
+    filter(stage_num == 1)
+}
+```
+
+# Concreteness projection
+```{r}
+df_conc <- read_csv(here("concreteness", "concreteness_embeddings.csv"))
+
+# NOTE: LMER better than LM under AIC
+mod_conc <- lmer(glue('concreteness ~ {colnames(df_conc) |> 
+                      setdiff(c("expression", "concreteness")) |> 
+                      paste(collapse = " + ")} + (1 | expression)') |> as.formula(),
+                 data = df_conc)
+
+df_conc_out <- df_conc |> 
+  mutate(concreteness_pred = predict(mod_conc, newdata = df_conc, re.form = NA)) |> 
+  select(expression, concreteness, concreteness_pred)
+
+df_conc_out |> 
+  ggplot(aes(x = concreteness, y = concreteness_pred)) +
+  geom_point(alpha = .01) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") +
+  labs(x = "Empirical concreteness values",
+       y = "Predicted concreteness values")
+```
+Reasonable fit. Potentially consider switching to a logistic regression in the future given the bounded nature of the concreteness scale.
+
+# Concreteness in messages
+```{r}
+all_embeds_conc <- all_embeds |> 
+  mutate(concreteness_pred = predict(mod_conc, newdata = all_embeds, re.form = NA))
+
+all_embeds_conc |> 
+  ggplot(aes(x = rep_num, y = concreteness_pred)) +
+  geom_point(alpha = .01,
+             position = position_jitter(width = .2)) +
+  geom_smooth(method = "lm", formula = y ~ log(x)) +
+  labs(x = "Repetition number",
+       y = "Predicted concreteness values")
+```
+
+
+
+
+
+
