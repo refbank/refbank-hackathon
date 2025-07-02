@@ -87,8 +87,10 @@ df_conc_out |>
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") +
   labs(x = "Empirical concreteness values",
        y = "Predicted concreteness values")
+
+qqnorm(resid(mod_conc))
 ```
-Reasonable fit. Potentially consider switching to a logistic regression in the future given the bounded nature of the concreteness scale.
+Reasonable fit. Potentially consider switching to a logistic regression in the future given the bounded nature of the concreteness scale, but really the amount of outlier badness is not that bad.
 
 # Concreteness in messages
 ```{r}
