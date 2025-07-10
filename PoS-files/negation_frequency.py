@@ -4,12 +4,12 @@ import seaborn as sns
 import os
 import spacy
 
-# Load English spaCy model
+# Load spaCy model
 nlp = spacy.load("en_core_web_sm")
 
 # File paths
-message_path = "harmonized_data/hawkins2020_characterizing_cued/messages.csv"
-trial_path = "harmonized_data/hawkins2020_characterizing_cued/trials.csv"
+message_path = "harmonized_data/hawkins2020_characterizing_uncued/messages.csv"
+trial_path = "harmonized_data/hawkins2020_characterizing_uncued/trials.csv"
 paper_name = os.path.basename(os.path.dirname(message_path))
 
 # Load data
@@ -32,7 +32,7 @@ def count_negations(text):
 # Apply function
 df["negation_count"] = df["text"].apply(count_negations)
 
-# Aggregate: average negation count per rep_num
+# Average negation count per rep_num
 neg_by_rep = df.groupby("rep_num")["negation_count"].mean().reset_index()
 
 # Plot
