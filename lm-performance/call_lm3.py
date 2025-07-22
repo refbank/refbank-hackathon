@@ -25,51 +25,56 @@ def get_user_message(messages):
         return ""
     user_message = ""
     for message in messages:
-         user_message += "{}: {}\n".format(message['role'], message['text'])
+        user_message += "{}: {}\n".format(message.get('role', ''), message.get('text', ''))
     return user_message
 
 def preprocess_messages(row, history_type):
     chat_messages = ""
     if history_type != "none":
-        message_history_trunc = row["message_history_trunc"]
+        message_history_trunc = row.get("message_history_trunc", "")
         if not isinstance(message_history_trunc, str):
             message_history = []
         else:
             message_history = literal_eval(message_history_trunc.replace("nan", "''"))
 
-        target_history = literal_eval(row["target_history_trunc"])
+        target_history = literal_eval(row.get("target_history_trunc", "[]"))
         for messages, target in zip(message_history, target_history):
             user_message = get_user_message(messages)
-            chat_messages += f"user: {user_message}\nassistant: {target}\n"
+            chat_messages += "user: {}\nassistant: {}\n".format(user_message, target)
 
-    this_trial_messages = row["messages"]
+    this_trial_messages = row.get("messages", "")
     if not isinstance(this_trial_messages, str):
         chat_messages += "user: describer: \n"
     else:
         this_trial_messages = literal_eval(this_trial_messages.replace("nan", "''"))
-        chat_messages += f"user: {get_user_message(this_trial_messages)}"
+        chat_messages += "user: {}".format(get_user_message(this_trial_messages))
 
     return chat_messages
 
 def main(args):
+    # Load data
     df_with_history = pd.read_csv("lm-performance/trials_with_history.csv")
     if args.n_trials is not None:
         df_with_history = df_with_history.head(args.n_trials)
 
+    # Load image
     grid_image = Image.open("lm-performance/compiled_grid.png").convert("RGB")
 
+    # Shuffle histories if needed
     if args.history_type == "shuffled":
-        print("shuffling histories")
+        print("Shuffling histories")
         perm = np.random.permutation(len(df_with_history))
         df_with_history["message_history_trunc"] = df_with_history["message_history_trunc"].iloc[perm].reset_index(drop=True)
         df_with_history["target_history_trunc"] = df_with_history["target_history_trunc"].iloc[perm].reset_index(drop=True)
 
+    # Prepare prompts
     df_with_history["chat_prompt"] = df_with_history.apply(
         partial(preprocess_messages, history_type=args.history_type), axis=1
     )
 
-    print(f"example chat prompt: {df_with_history['chat_prompt'].sample(1).iloc[0]}")
+    print("Example chat prompt:\n{}".format(df_with_history['chat_prompt'].sample(1).iloc[0]))
 
+    # Load BLIP-2 model and processor
     processor = Blip2Processor.from_pretrained(args.model)
     model = Blip2ForConditionalGeneration.from_pretrained(args.model, device_map="auto")
 
@@ -82,23 +87,29 @@ def main(args):
             + chat_prompt
         )
 
+        # Prepare model input
         inputs = processor(images=grid_image, text=full_prompt, return_tensors="pt").to(model.device)
+
+        # Run model
         outputs = model.generate(**inputs, max_new_tokens=10)
         decoded = processor.tokenizer.decode(outputs[0], skip_special_tokens=True)
         answer = extract_answer(decoded)
         model_choices.append(answer)
 
+    # Save results
     df_with_history["model_choice"] = model_choices
-
     df_with_history = df_with_history[["trial_id", "stage_num", "rep_num", "trial_num", "chat_prompt", "model_choice", "target"]]
-    model_name = args.model.replace("/", "--")
-    df_with_history.to_csv(
-        f"lm-performance/results/model_choices-{model_name}-{args.experiment_name}-blip2-history-{args.history_type}.csv",
-        index=False,
-    )
 
+    model_name = args.model.replace("/", "--")
+    save_path = "lm-performance/results/model_choices-{}-{}-blip2-history-{}.csv".format(
+        model_name, args.experiment_name, args.history_type
+    )
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    df_with_history.to_csv(save_path, index=False)
+
+    # Print accuracy
     accuracy = compute_accuracy(model_choices, df_with_history["target"])
-    print(f"Model accuracy: {accuracy}")
+    print("Model accuracy: {:.3f}".format(accuracy))
 
 if __name__ == "__main__":
     parser = ArgumentParser()
