@@ -25,7 +25,7 @@ def get_user_message(messages):
         return ""
     user_message = ""
     for message in messages:
-        user_message += f"{message['role']}: {message['text']}\n"
+         user_message += "{}: {}\n".format(message['role'], message['text'])
     return user_message
 
 def preprocess_messages(row, history_type):
