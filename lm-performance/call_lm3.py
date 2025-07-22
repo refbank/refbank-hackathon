@@ -91,7 +91,14 @@ def main(args):
         inputs = processor(images=grid_image, text=full_prompt, return_tensors="pt").to(model.device)
 
         # Run model
-        outputs = model.generate(**inputs, max_new_tokens=10)
+        input_ids = inputs["input_ids"]
+        attention_mask = inputs.get("attention_mask", None)
+
+        if attention_mask is not None:
+            outputs = model.generate(input_ids=input_ids, attention_mask=attention_mask, max_new_tokens=10)
+        else:
+            outputs = model.generate(input_ids=input_ids, max_new_tokens=10)
+
         decoded = processor.tokenizer.decode(outputs[0], skip_special_tokens=True)
         answer = extract_answer(decoded)
         model_choices.append(answer)
