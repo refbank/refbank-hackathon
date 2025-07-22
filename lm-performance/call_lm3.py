@@ -53,12 +53,12 @@ def preprocess_messages(row, history_type):
 
 def main(args):
     # Load data
-    df_with_history = pd.read_csv("lm-performance/trials_with_history.csv")
+    df_with_history = pd.read_csv("trials_with_history.csv")
     if args.n_trials is not None:
         df_with_history = df_with_history.head(args.n_trials)
 
     # Load image
-    grid_image = Image.open("lm-performance/compiled_grid.png").convert("RGB")
+    grid_image = Image.open("compiled_grid.png").convert("RGB")
 
     # Shuffle histories if needed
     if args.history_type == "shuffled":
