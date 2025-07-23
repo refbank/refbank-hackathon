@@ -12,8 +12,6 @@ import os
 from tqdm import tqdm
 import re
 
-DATA_DIR = "lm-performance"  # Base directory for inputs/outputs
-
 def extract_answer(text):
     match = re.search(r"\b([A-L])\b", text.strip())
     return match.group(1) if match else "?"
@@ -56,14 +54,12 @@ def preprocess_messages(row, history_type):
 
 def main(args):
     # Load data
-    csv_path = os.path.join(DATA_DIR, "trials_with_history.csv")
-    df_with_history = pd.read_csv(csv_path)
+    df_with_history = pd.read_csv("trials_with_history.csv")
     if args.n_trials is not None:
         df_with_history = df_with_history.head(args.n_trials)
 
     # Load image
-    img_path = os.path.join(DATA_DIR, "compiled_grid.png")
-    grid_image = Image.open(img_path).convert("RGB")
+    grid_image = Image.open("compiled_grid.png").convert("RGB")
 
     # Shuffle histories if needed
     if args.history_type == "shuffled":
@@ -117,7 +113,7 @@ def main(args):
     df_with_history = df_with_history[["trial_id", "stage_num", "rep_num", "trial_num", "chat_prompt", "model_choice", "target"]]
 
     model_name = args.model.replace("/", "--")
-    save_dir = os.path.join(DATA_DIR, "results")
+    save_dir = "results"
     os.makedirs(save_dir, exist_ok=True)
     save_path = os.path.join(
         save_dir,
