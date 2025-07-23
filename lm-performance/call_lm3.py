@@ -12,8 +12,9 @@ import os
 from tqdm import tqdm
 import re
 
+DATA_DIR = "lm-performance"  # Base directory for inputs/outputs
+
 def extract_answer(text):
-    # Extract a single capital letter A–L using regex
     match = re.search(r"\b([A-L])\b", text.strip())
     return match.group(1) if match else "?"
 
@@ -30,14 +31,16 @@ def get_user_message(messages):
 
 def preprocess_messages(row, history_type):
     chat_messages = ""
+    message_history_trunc = row.get("message_history_trunc", "")
+    target_history_trunc = row.get("target_history_trunc", "")
+    
     if history_type != "none":
-        message_history_trunc = row.get("message_history_trunc", "")
         if not isinstance(message_history_trunc, str):
             message_history = []
         else:
             message_history = literal_eval(message_history_trunc.replace("nan", "''"))
 
-        target_history = literal_eval(row.get("target_history_trunc", "[]"))
+        target_history = literal_eval(target_history_trunc if isinstance(target_history_trunc, str) else "[]")
         for messages, target in zip(message_history, target_history):
             user_message = get_user_message(messages)
             chat_messages += "user: {}\nassistant: {}\n".format(user_message, target)
@@ -53,12 +56,14 @@ def preprocess_messages(row, history_type):
 
 def main(args):
     # Load data
-    df_with_history = pd.read_csv("trials_with_history.csv")
+    csv_path = os.path.join(DATA_DIR, "trials_with_history.csv")
+    df_with_history = pd.read_csv(csv_path)
     if args.n_trials is not None:
         df_with_history = df_with_history.head(args.n_trials)
 
     # Load image
-    grid_image = Image.open("compiled_grid.png").convert("RGB")
+    img_path = os.path.join(DATA_DIR, "compiled_grid.png")
+    grid_image = Image.open(img_path).convert("RGB")
 
     # Shuffle histories if needed
     if args.history_type == "shuffled":
@@ -89,17 +94,21 @@ def main(args):
 
         # Prepare model input
         inputs = processor(images=grid_image, text=full_prompt, return_tensors="pt").to(model.device)
-
-        # Run model
         input_ids = inputs["input_ids"]
         attention_mask = inputs.get("attention_mask", None)
 
-        if attention_mask is not None:
-            outputs = model.generate(input_ids=input_ids, attention_mask=attention_mask, max_new_tokens=10)
-        else:
-            outputs = model.generate(input_ids=input_ids, max_new_tokens=10)
+        # Run model
+        try:
+            if attention_mask is not None:
+                outputs = model.generate(input_ids=input_ids, attention_mask=attention_mask, max_new_tokens=10)
+            else:
+                outputs = model.generate(input_ids=input_ids, max_new_tokens=10)
 
-        decoded = processor.tokenizer.decode(outputs[0], skip_special_tokens=True)
+            decoded = processor.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        except Exception as e:
+            print(f"Error during generation or decoding: {e}")
+            decoded = ""
+
         answer = extract_answer(decoded)
         model_choices.append(answer)
 
@@ -108,10 +117,13 @@ def main(args):
     df_with_history = df_with_history[["trial_id", "stage_num", "rep_num", "trial_num", "chat_prompt", "model_choice", "target"]]
 
     model_name = args.model.replace("/", "--")
-    save_path = "lm-performance/results/model_choices-{}-{}-blip2-history-{}.csv".format(
-        model_name, args.experiment_name, args.history_type
+    save_dir = os.path.join(DATA_DIR, "results")
+    os.makedirs(save_dir, exist_ok=True)
+    save_path = os.path.join(
+        save_dir,
+        "model_choices-{}-{}-blip2-history-{}.csv".format(model_name, args.experiment_name, args.history_type)
     )
-    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    print("Saving results to:", save_path)
     df_with_history.to_csv(save_path, index=False)
 
     # Print accuracy
