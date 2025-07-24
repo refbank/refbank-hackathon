@@ -1,8 +1,8 @@
+
 import torch
 import pandas as pd
 import numpy as np
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from pyprojroot import here
 from PIL import Image
 from argparse import ArgumentParser
 from functools import partial
@@ -14,8 +14,8 @@ from tqdm import tqdm
 def get_image_token(model_name):
     if "gemma" in model_name:
         return "<start_of_image>"
-    elif "llama" in model_name:
-        return "<|image|>"
+    elif "llava" in model_name:
+        return "<image>"
     elif "idefics" in model_name:
         return "<image>"
     elif "Qwen" in model_name:
@@ -28,117 +28,102 @@ def extract_answer(text):
     try:
         return text.split("<answer>")[1].split("</answer>")[0].strip()
     except IndexError:
-        return text.strip()
+        return text.strip()[-1].upper()
 
 
-def compute_accuracy(model_choices, labels):
-    return np.mean(np.array(model_choices) == np.array(labels))
+def compute_accuracy(preds, labels):
+    return np.mean(np.array(preds) == np.array(labels))
 
 
 def get_user_message(messages):
     if not isinstance(messages, list):
         return ""
-    user_message = ""
-    for message in messages:
-        user_message += f"{message['role']}: {message['text']}\n"
-    return user_message
+    return "\n".join(f"{m['role']}: {m['text']}" for m in messages)
 
 
 def preprocess_messages(row, history_type):
-    chat_messages = []
+    messages = []
+
     if history_type != "none":
-        message_history_trunc = row["message_history_trunc"]
-        if not isinstance(message_history_trunc, str):
-            message_history = []
-        else:
-            message_history = literal_eval(message_history_trunc.replace("nan", "''"))
+        hist = row.get("message_history_trunc", "[]")
+        target = row.get("target_history_trunc", "[]")
+        hist = literal_eval(hist.replace("nan", "''")) if isinstance(hist, str) else []
+        target = literal_eval(target) if isinstance(target, str) else []
 
-        target_history = literal_eval(row["target_history_trunc"])
-        for messages, target in zip(message_history, target_history):
-            user_message = get_user_message(messages)
-            chat_messages.append({"role": "user", "content": user_message})
-            chat_messages.append({"role": "assistant", "content": target})
+        for h, t in zip(hist, target):
+            messages.append({"role": "user", "content": get_user_message(h)})
+            messages.append({"role": "assistant", "content": t})
 
-    this_trial_messages = row["messages"]
-    if not isinstance(this_trial_messages, str):
-        chat_messages.append({"role": "user", "content": "describer: \n"})
+    trial = row.get("messages", "")
+    if isinstance(trial, str):
+        trial = literal_eval(trial.replace("nan", "''"))
     else:
-        this_trial_messages = literal_eval(this_trial_messages.replace("nan", "''"))
-        chat_messages.append({"role": "user", "content": get_user_message(this_trial_messages)})
+        trial = []
 
-    return chat_messages
+    messages.append({"role": "user", "content": get_user_message(trial)})
+    return messages
 
 
 def main(args):
-    df_with_history = pd.read_csv(here("lm-performance/trials_with_history.csv"))
-    if args.n_trials is not None:
-        df_with_history = df_with_history.head(args.n_trials)
+    df = pd.read_csv("trials_with_history.csv")
+    if args.n_trials:
+        df = df.head(args.n_trials)
 
-    grid_image = Image.open(here("lm-performance/compiled_grid.png"))
+    # Load image
+    image_token = get_image_token(args.model)
+    grid_image = Image.open("compiled_grid.png")
 
+    # Shuffle history
     if args.history_type == "shuffled":
-        print("shuffling histories")
-        perm = np.random.permutation(len(df_with_history))
-        df_with_history["message_history_trunc"] = df_with_history["message_history_trunc"].iloc[perm]
-        df_with_history["target_history_trunc"] = df_with_history["target_history_trunc"].iloc[perm]
+        perm = np.random.permutation(len(df))
+        df["message_history_trunc"] = df["message_history_trunc"].iloc[perm].reset_index(drop=True)
+        df["target_history_trunc"] = df["target_history_trunc"].iloc[perm].reset_index(drop=True)
 
-    df_with_history["chat_prompt"] = df_with_history.apply(
-        partial(preprocess_messages, history_type=args.history_type), axis=1
-    )
+    df["chat_prompt"] = df.apply(partial(preprocess_messages, history_type=args.history_type), axis=1)
+    print("Sample prompt:\n", df["chat_prompt"].iloc[0])
 
-    print(f"example chat prompt: {df_with_history['chat_prompt'].sample(1).iloc[0]}")
-
-    tokenizer = AutoTokenizer.from_pretrained(args.model)
-    model = AutoModelForCausalLM.from_pretrained(args.model)
+    tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
+    model = AutoModelForCausalLM.from_pretrained(args.model, torch_dtype=torch.float16, device_map="auto")
 
     if args.method == "direct":
-        system_prompt = """You will be presented with a list of messages between people playing a reference game, where the describer has to get the matcher to choose an image from a list of images. Your goal is to guess which of the images the describer is trying to get the matcher to choose. The images, with their labels, are shown in the image.
-
-Please answer with just the letter corresponding to the image you think the describer is trying to get the matcher to choose.
-"""
-    elif args.method == "cot":
-        system_prompt = """You will be presented with a list of messages between people playing a reference game, where the describer has to get the matcher to choose an image from a list of images. Your goal is to guess which of the images the describer is trying to get the matcher to choose. The images, with their labels, are shown in the image.
-
-Think step by step before your answer, with your reasoning contained in <think></think> tags. Then respond with your answer in <answer></answer> tags.
-"""
+        system_prompt = (
+            "You are given a chat between a describer and matcher about a mystery object. "
+            "They are trying to identify which labeled tangram (A to L) is being referred to.\n"
+            "Refer to the image.\n\n"
+            "Answer with a single letter only.\n\n"
+        )
     else:
-        raise ValueError(f"Method {args.method} not supported")
+        system_prompt = (
+            "You are shown a dialogue between a describer and matcher trying to guess a labeled image (A to L).\n"
+            "Think carefully step-by-step in <think>...</think>, and then give the answer in <answer>...</answer>.\n"
+        )
 
     model_choices = []
-    for chat_prompt in tqdm(df_with_history["chat_prompt"]):
-        chat = (
-            [
-                {"role": "system", "content": system_prompt + get_image_token(args.model)},
-                *chat_prompt,
-            ]
-        )
-        prompt = tokenizer.apply_chat_template(chat, add_generation_prompt=True, tokenize=False)
-        inputs = tokenizer(prompt, return_tensors="pt")
-        outputs = model.generate(**inputs, max_new_tokens=32, temperature=0.0)
+    for chat_prompt in tqdm(df["chat_prompt"]):
+        chat = [{"role": "system", "content": system_prompt + image_token}] + chat_prompt
+        full_prompt = tokenizer.apply_chat_template(chat, tokenize=False, add_generation_prompt=True)
+
+        inputs = tokenizer(full_prompt, return_tensors="pt").to(model.device)
+        outputs = model.generate(**inputs, max_new_tokens=64, temperature=0.0)
         decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        answer = extract_answer(decoded)
-        model_choices.append(answer)
+        model_choices.append(extract_answer(decoded))
 
-    df_with_history["model_choice"] = model_choices
+    df["model_choice"] = model_choices
+    acc = compute_accuracy(model_choices, df["target"])
+    print(f"Accuracy: {acc:.3f}")
 
-    df_with_history = df_with_history[["trial_id", "stage_num", "rep_num", "trial_num", "chat_prompt", "model_choice", "target"]]
-    model_name = args.model.replace("/", "--")
-    df_with_history.to_csv(
-        here(f"lm-performance/results/model_choices-{model_name}-{args.experiment_name}-{args.method}-history-{args.history_type}.csv"),
-        index=False,
-    )
-
-    accuracy = compute_accuracy(model_choices, df_with_history["target"])
-    print(f"Model accuracy: {accuracy}")
+    os.makedirs("results", exist_ok=True)
+    fname = f"results/model_choices-{args.model.replace('/', '--')}-{args.experiment_name}-{args.method}-history-{args.history_type}.csv"
+    df.to_csv(fname, index=False)
+    print("Saved to", fname)
 
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--model", type=str, default="google/gemma-2b-it")
+    parser.add_argument("--model", type=str, default="llava-hf/llava-1.5-7b-hf")
     parser.add_argument("--experiment_name", type=str, default="hawkins2020_characterizing_cued")
     parser.add_argument("--n_trials", type=int, default=None)
-    parser.add_argument("--method", type=str, default="direct")
-    parser.add_argument("--history_type", type=str, default="yoked", choices=["yoked", "shuffled", "none"])
+    parser.add_argument("--method", type=str, choices=["direct", "cot"], default="direct")
+    parser.add_argument("--history_type", choices=["yoked", "shuffled", "none"], default="yoked")
     args = parser.parse_args()
-
     main(args)
