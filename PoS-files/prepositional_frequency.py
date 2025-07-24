@@ -5,8 +5,8 @@ import os
 import spacy
 
 # File paths 
-message_path = "harmonized_data/hawkins2019_continual/messages.csv"
-trial_path = "harmonized_data/hawkins2019_continual/trials.csv"
+message_path = "harmonized_data/hawkins2020_characterizing_cued/messages.csv"
+trial_path = "harmonized_data/hawkins2020_characterizing_cued/trials.csv"
 paper_name = os.path.basename(os.path.dirname(message_path))
 
 # Load data 
@@ -18,24 +18,32 @@ df = df[df["role"] == "describer"].copy()
 # Load spaCy 
 nlp = spacy.load("en_core_web_sm")
 
-# Count prepositional phrases per message 
-def count_preps(text):
+# Count prepositions and words per message
+def count_preps_and_words(text):
     if pd.isna(text) or not text.strip():
-        return 0
+        return pd.Series({"prep_count": 0, "word_count": 0})
     doc = nlp(text)
-    return sum(1 for token in doc if token.dep_ == "prep")
+    prep_count = sum(1 for token in doc if token.dep_ == "prep")
+    word_count = sum(1 for token in doc if token.is_alpha)
+    return pd.Series({"prep_count": prep_count, "word_count": word_count})
 
-df["prep_count"] = df["text"].apply(count_preps)
+df[["prep_count", "word_count"]] = df["text"].apply(count_preps_and_words)
+
+# Filter out empty messages
+df = df[df["word_count"] > 0].copy()
+
+# Normalize
+df["prep_rate"] = df["prep_count"] / df["word_count"]
 
 # Aggregate over repetitions 
-prep_by_rep = df.groupby("rep_num")["prep_count"].mean().reset_index()
+prep_by_rep = df.groupby("rep_num")["prep_rate"].mean().reset_index()
 
 # Plot
 plt.figure(figsize=(10, 6))
-sns.lineplot(data=prep_by_rep, x="rep_num", y="prep_count", marker="o")
-plt.title(f"{paper_name}: Average Prepositional Phrase Count Over Repetitions")
+sns.lineplot(data=prep_by_rep, x="rep_num", y="prep_rate", marker="o")
+plt.title(f"{paper_name}: Prepositional Phrase Rate per Word Over Repetitions")
 plt.xlabel("Repetition Number")
-plt.ylabel("Average Number of Prepositional Phrases per Message")
+plt.ylabel("Avg. Prepositional Phrase Rate (per word)")
 plt.grid(True)
 plt.tight_layout()
 plt.show()

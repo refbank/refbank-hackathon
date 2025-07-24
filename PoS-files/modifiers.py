@@ -12,15 +12,13 @@ message_path = "harmonized_data/hawkins2020_characterizing_cued/messages.csv"
 trial_path = "harmonized_data/hawkins2020_characterizing_cued/trials.csv"
 paper_name = os.path.basename(os.path.dirname(message_path))
 
-# Load data
+# Load and merge
 messages_df = pd.read_csv(message_path)
 trials_df = pd.read_csv(trial_path)
-
-# Merge to get rep_num
 df = pd.merge(messages_df, trials_df[['trial_id', 'rep_num']], on='trial_id', how='left')
 df = df[df["role"] == "describer"].copy()
 
-# Extract modifier/specificity features
+# Extract modifier/specificity features + word count
 def extract_mod_features(text):
     if pd.isna(text):
         return {
@@ -28,7 +26,8 @@ def extract_mod_features(text):
             "num_noun_chunks": 0,
             "avg_np_len": 0.0,
             "num_modifiers": 0,
-            "num_preps": 0
+            "num_preps": 0,
+            "word_count": 0
         }
     
     doc = nlp(text)
@@ -36,6 +35,7 @@ def extract_mod_features(text):
     noun_chunks = list(doc.noun_chunks)
     preps = [t for t in doc if t.pos_ == "ADP" and t.dep_ == "prep"]
     modifiers = [t for t in doc if t.dep_ in {"amod", "nummod", "advmod"}]
+    words = [t for t in doc if t.is_alpha]
 
     avg_np_len = sum(len(chunk) for chunk in noun_chunks) / len(noun_chunks) if noun_chunks else 0.0
 
@@ -44,35 +44,45 @@ def extract_mod_features(text):
         "num_noun_chunks": len(noun_chunks),
         "avg_np_len": avg_np_len,
         "num_modifiers": len(modifiers),
-        "num_preps": len(preps)
+        "num_preps": len(preps),
+        "word_count": len(words)
     }
 
-# Apply to all messages
+# Apply
 mod_features = df["text"].apply(extract_mod_features).apply(pd.Series)
 df = pd.concat([df, mod_features], axis=1)
 
-# Aggregate and reshape for plotting 
-features_to_plot = ["num_adjectives", "num_noun_chunks", "avg_np_len", "num_modifiers", "num_preps"]
-summary_df = df.groupby("rep_num")[features_to_plot].mean().reset_index()
+# Drop any rows with 0 word count to avoid divide-by-zero
+df = df[df["word_count"] > 0].copy()
 
-# Rename for more readable labels
+# Normalize counts by word count
+df["adj_rate"] = df["num_adjectives"] / df["word_count"]
+df["np_rate"] = df["num_noun_chunks"] / df["word_count"]
+df["mod_rate"] = df["num_modifiers"] / df["word_count"]
+df["prep_rate"] = df["num_preps"] / df["word_count"]
+# avg_np_len is already a rate and doesn’t need normalization
+
+# Aggregate normalized features
+summary_df = df.groupby("rep_num")[["adj_rate", "np_rate", "avg_np_len", "mod_rate", "prep_rate"]].mean().reset_index()
+
+# Rename for readability
 label_map = {
-    "num_adjectives": "Average number of adjectives",
-    "num_noun_chunks": "Average number of noun phrases",
+    "adj_rate": "Adjectives per word",
+    "np_rate": "Noun phrases per word",
     "avg_np_len": "Average noun phrase length",
-    "num_modifiers": "Average number of modifiers (amod, advmod, nummod)",
-    "num_preps": "Average number of prepositional modifiers"
+    "mod_rate": "Modifiers per word (amod, advmod, nummod)",
+    "prep_rate": "Prepositional modifiers per word"
 }
 
 long_df = pd.melt(summary_df, id_vars="rep_num", var_name="Feature", value_name="Average")
 long_df["Feature"] = long_df["Feature"].map(label_map)
 
-# Plot all features on a single line plot 
+# Plot
 plt.figure(figsize=(12, 6))
 sns.lineplot(data=long_df, x="rep_num", y="Average", hue="Feature", marker="o")
-plt.title(f"{paper_name}: Modifier & Specificity Features Over Repetitions")
+plt.title(f"{paper_name}: Modifier & Specificity Feature Rates Over Repetitions")
 plt.xlabel("Repetition Number")
-plt.ylabel("Average Count / Length per Message")
+plt.ylabel("Average Rate (per word)")
 plt.grid(True)
 plt.tight_layout()
 plt.legend(title="Feature", loc="upper right")

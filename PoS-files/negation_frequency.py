@@ -8,8 +8,8 @@ import spacy
 nlp = spacy.load("en_core_web_sm")
 
 # File paths
-message_path = "harmonized_data/hawkins2020_characterizing_uncued/messages.csv"
-trial_path = "harmonized_data/hawkins2020_characterizing_uncued/trials.csv"
+message_path = "harmonized_data/hawkins2020_characterizing_cued/messages.csv"
+trial_path = "harmonized_data/hawkins2020_characterizing_cued/trials.csv"
 paper_name = os.path.basename(os.path.dirname(message_path))
 
 # Load data
@@ -22,25 +22,33 @@ df = pd.merge(messages_df, trials_df[['trial_id', 'rep_num']], on='trial_id', ho
 # Filter to describer messages only
 df = df[df["role"] == "describer"].copy()
 
-# Define a function to count negation tokens using spaCy
-def count_negations(text):
+# Define function to get negation count and word count
+def get_negation_and_word_count(text):
     if pd.isna(text):
-        return 0
+        return pd.Series({"negation_count": 0, "word_count": 0})
     doc = nlp(text)
-    return sum(1 for token in doc if token.dep_ == "neg")
+    negs = sum(1 for token in doc if token.dep_ == "neg")
+    words = sum(1 for token in doc if token.is_alpha)
+    return pd.Series({"negation_count": negs, "word_count": words})
 
-# Apply function
-df["negation_count"] = df["text"].apply(count_negations)
+# Apply to each message
+df[["negation_count", "word_count"]] = df["text"].apply(get_negation_and_word_count)
 
-# Average negation count per rep_num
-neg_by_rep = df.groupby("rep_num")["negation_count"].mean().reset_index()
+# Avoid divide-by-zero errors
+df = df[df["word_count"] > 0].copy()
+
+# Calculate negation rate per message
+df["negation_rate"] = df["negation_count"] / df["word_count"]
+
+# Group by repetition and get average negation rate
+neg_by_rep = df.groupby("rep_num")["negation_rate"].mean().reset_index()
 
 # Plot
 plt.figure(figsize=(10, 6))
-sns.lineplot(data=neg_by_rep, x="rep_num", y="negation_count", marker="o")
-plt.title(f"{paper_name}: Average Number of Negations per Message Over Repetitions")
+sns.lineplot(data=neg_by_rep, x="rep_num", y="negation_rate", marker="o")
+plt.title(f"{paper_name}: Average Negation Rate per Word Over Repetitions")
 plt.xlabel("Repetition Number")
-plt.ylabel("Average Negation Count per Message")
+plt.ylabel("Average Negation Rate (Negations per Word)")
 plt.grid(True)
 plt.tight_layout()
 plt.show()
