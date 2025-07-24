@@ -1,7 +1,7 @@
 import torch
 import pandas as pd
 import numpy as np
-from transformers import AutoTokenizer, AutoModelForVision2Seq
+from transformers import AutoTokenizer, AutoModelForVision2Seq, AutoProcessor
 from pyprojroot import here
 from PIL import Image
 from argparse import ArgumentParser
