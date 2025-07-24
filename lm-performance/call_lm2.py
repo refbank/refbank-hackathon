@@ -1,7 +1,7 @@
 import torch
 import pandas as pd
 import numpy as np
-from transformers import AutoProcessor, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForVision2Seq
 from pyprojroot import here
 from PIL import Image
 from argparse import ArgumentParser
@@ -64,7 +64,7 @@ def main(args):
     print("Example chat prompt:\n", df["chat_prompt"].iloc[0])
 
     processor = AutoProcessor.from_pretrained(args.model)
-    model = AutoModelForCausalLM.from_pretrained(args.model, device_map="auto", torch_dtype=torch.float16)
+    model = AutoModelForVision2Seq.from_pretrained(args.model, device_map="auto", torch_dtype=torch.float16)
 
     model_choices = []
     for prompt in tqdm(df["chat_prompt"]):
