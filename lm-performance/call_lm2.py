@@ -29,7 +29,7 @@ def main(args):
     results = []
 
     for _, row in tqdm(df.iterrows(), total=len(df)):
-        conv = row["history"] if args.history_type == "yoked" else row["utterance"]
+        conv = row["message_history_trunc"] if args.history_type == "yoked" else row["utterance"]
 
         messages = [
             {"role": "system", "content": system_prompt},
