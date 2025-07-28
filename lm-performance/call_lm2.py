@@ -1,58 +1,64 @@
 import argparse
-import torch
-from transformers import IdeficsForVisionText2Text, AutoProcessor
-from PIL import Image
 import pandas as pd
+from PIL import Image
+import torch
+from transformers import AutoProcessor, IdeficsForVisionText2Text
 from tqdm import tqdm
-import os
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="HuggingFaceM4/idefics-9b-instruct")
-    parser.add_argument("--input_csv", type=str, required=True)
-    parser.add_argument("--image_path", type=str, required=True)
-    parser.add_argument("--output_csv", type=str, required=True)
-    return parser.parse_args()
 
 def main(args):
-    # Load model and processor
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     processor = AutoProcessor.from_pretrained(args.model)
     model = IdeficsForVisionText2Text.from_pretrained(
         args.model,
         torch_dtype=torch.float16,
         device_map="auto"
     )
+
     model.eval()
 
-    # Load image
+    df = pd.read_csv(args.data_path)
     image = Image.open(args.image_path).convert("RGB")
 
-    # Load CSV
-    df = pd.read_csv(args.input_csv)
+    system_prompt = (
+        "You are shown a conversation between a describer and matcher trying to identify an image among labeled options (A to L). "
+        "Based on the conversation and the image, guess which tangram (labeled A to L) is being described.\n"
+        "Answer with a single capital letter from A to L. Do not include any explanation."
+    )
 
     results = []
 
-    for idx, row in tqdm(df.iterrows(), total=len(df)):
-        prompt = row["prompt"]
+    for _, row in tqdm(df.iterrows(), total=len(df)):
+        conv = row["history"] if args.history_type == "yoked" else row["utterance"]
 
-        inputs = processor(
-            text=prompt,
-            images=image,
-            return_tensors="pt"
-        ).to(model.device, torch.float16)
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": [conv, image]}
+        ]
+
+        inputs = processor(messages, return_tensors="pt").to(device, torch.float16)
 
         with torch.no_grad():
-            generated_ids = model.generate(**inputs, max_new_tokens=10)
+            outputs = model.generate(
+                **inputs,
+                max_new_tokens=5,
+                do_sample=False
+            )
 
-        response = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
-        results.append({
-            "prompt": prompt,
-            "prediction": response.strip()
-        })
+        decoded = processor.batch_decode(outputs, skip_special_tokens=True)[0].strip()
+        results.append({"trial_id": row["trial_id"], "model_choice": decoded})
 
-    output_df = pd.DataFrame(results)
-    output_df.to_csv(args.output_csv, index=False)
-    print(f"Saved predictions to {args.output_csv}")
+    out_path = f"model_choices-{args.model.replace('/', '--')}-{args.experiment_name}-idefics-history-{args.history_type}.csv"
+    pd.DataFrame(results).to_csv(out_path, index=False)
+    print(f"Saved predictions to {out_path}")
+
 
 if __name__ == "__main__":
-    main(parse_args())
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", required=True)
+    parser.add_argument("--experiment_name", required=True)
+    parser.add_argument("--history_type", choices=["yoked", "none"], default="yoked")
+    parser.add_argument("--data_path", default="trials_with_history.csv")
+    parser.add_argument("--image_path", default="compiled_grid.png")
+    args = parser.parse_args()
+    main(args)
