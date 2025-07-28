@@ -34,7 +34,8 @@ def main(args):
 
         messages = [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": [conv.strip(), image]},
+            {"role": "user", "content": conv.strip()},
+            {"role": "user", "content": image}
         ]
 
         try:
