@@ -33,8 +33,9 @@ def main(args):
 
         messages = [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": [conv, image]}
+            {"role": "user", "content": [conv.strip(), image]}
         ]
+
 
         inputs = processor(messages, return_tensors="pt").to(device, torch.float16)
 
