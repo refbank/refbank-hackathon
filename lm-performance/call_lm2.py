@@ -1,4 +1,3 @@
-
 import argparse, ast, warnings, pandas as pd, torch
 from PIL import Image
 from tqdm import tqdm
@@ -11,8 +10,22 @@ def _flatten(obj):
     "Recursively collect dicts inside lists/strings → list[dict]"
     if obj is None or (isinstance(obj, float) and pd.isna(obj)):
         return []
+    
     if isinstance(obj, str):
-        obj = ast.literal_eval(obj.replace("nan", "''"))
+        # Handle empty string cases
+        if not obj.strip() or obj.strip() == '[]':
+            return []
+        try:
+            # Try to parse the string representation
+            obj = ast.literal_eval(obj.replace("nan", "''"))
+        except (ValueError, SyntaxError) as e:
+            print(f"Failed to parse string with ast.literal_eval: {e}")
+            return []
+    
+    # Handle the case where obj is already a list
+    if isinstance(obj, list) and not obj:
+        return []
+    
     out = []
     stack = [obj]
     while stack:
@@ -58,9 +71,12 @@ def main(opt):
 
             prompt = f"{system_prompt}\n\n{txt}"
             inputs = proc(images=grid, text=prompt, return_tensors="pt")
+            
+            # Fixed: Only move to device, don't change dtype for all tensors
             for k, v in inputs.items():
                 if torch.is_tensor(v):
-                    inputs[k] = v.to(device, dtype)
+                    inputs[k] = v.to(device)
+            
             with torch.no_grad():
                 out_ids = model.generate(**inputs, max_new_tokens=5, do_sample=False)
             pred = proc.batch_decode(out_ids, skip_special_tokens=True)[0].strip()
