@@ -81,10 +81,16 @@ def main(opt):
                 out_ids = model.generate(**inputs, max_new_tokens=5, do_sample=False)
             pred = proc.batch_decode(out_ids, skip_special_tokens=True)[0].strip()
 
+            # Extract just the first A-L letter from prediction for accuracy
+            import re
+            pred_clean = re.search(r'[A-L]', pred)
+            pred_letter = pred_clean.group(0) if pred_clean else pred
+            
             rows_out.append({
                 "trial_id": row["trial_id"], 
                 "model_choice": pred,
-                "target": row["target"]
+                "target": row["target"],
+                "correct": pred_letter == row["target"]
             })
 
         except Exception as e:
@@ -98,12 +104,10 @@ def main(opt):
     results_df = pd.DataFrame(rows_out)
     results_df.to_csv(out_csv, index=False)
     
-    # Calculate and print accuracy
+    # Calculate and print accuracy (now much faster)
     if len(rows_out) > 0:
-        # Extract just the first letter from model predictions (in case model outputs more than just the letter)
-        results_df['model_choice_clean'] = results_df['model_choice'].str.extract(r'([A-L])')
-        correct = (results_df['model_choice_clean'] == results_df['target']).sum()
-        total = len(results_df)
+        correct = sum(row["correct"] for row in rows_out)
+        total = len(rows_out)
         accuracy = correct / total * 100
         
         print(f"saved → {out_csv}   ({total} rows)")
