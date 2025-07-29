@@ -81,7 +81,11 @@ def main(opt):
                 out_ids = model.generate(**inputs, max_new_tokens=5, do_sample=False)
             pred = proc.batch_decode(out_ids, skip_special_tokens=True)[0].strip()
 
-            rows_out.append({"trial_id": row["trial_id"], "model_choice": pred})
+            rows_out.append({
+                "trial_id": row["trial_id"], 
+                "model_choice": pred,
+                "target": row["target"]
+            })
 
         except Exception as e:
             print(f"trial {idx} (id={row.get('trial_id', '?')}): {e}")
@@ -90,8 +94,22 @@ def main(opt):
         f"model_choices-{opt.model.replace('/','--')}-"
         f"{opt.experiment_name}-idefics-{opt.history_type}.csv"
     )
-    pd.DataFrame(rows_out).to_csv(out_csv, index=False)
-    print(f"saved → {out_csv}   ({len(rows_out)} rows)")
+    
+    results_df = pd.DataFrame(rows_out)
+    results_df.to_csv(out_csv, index=False)
+    
+    # Calculate and print accuracy
+    if len(rows_out) > 0:
+        # Extract just the first letter from model predictions (in case model outputs more than just the letter)
+        results_df['model_choice_clean'] = results_df['model_choice'].str.extract(r'([A-L])')
+        correct = (results_df['model_choice_clean'] == results_df['target']).sum()
+        total = len(results_df)
+        accuracy = correct / total * 100
+        
+        print(f"saved → {out_csv}   ({total} rows)")
+        print(f"Accuracy: {correct}/{total} = {accuracy:.2f}%")
+    else:
+        print(f"saved → {out_csv}   (0 rows) - No successful predictions!")
 
 # ---------- CLI --------------------------------------------------------
 if __name__ == "__main__":
