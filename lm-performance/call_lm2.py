@@ -59,15 +59,9 @@ def main(opt):
     grid = Image.open(opt.image_path).convert("RGB")
 
     system_prompt = (
-        "Look at this image with tangrams labeled A through L. "
-        "Read each conversation and identify which tangram is being described.\n\n"
-        "Example:\n"
-        "Conversation: 'This looks like a house with a triangle roof'\n"
-        "Answer: C\n\n"
-        "Example:\n" 
-        "Conversation: 'I see a bird flying with wings spread'\n"
-        "Answer: F\n\n"
-        "Now your turn:\n"
+        "You are looking at an image with 12 tangram shapes labeled A, B, C, D, E, F, G, H, I, J, K, and L.\n"
+        "Based on the conversation below, choose which tangram letter (A through L) best matches the description.\n"
+        "Respond with only the single letter, nothing else.\n\n"
     )
 
     rows_out = []
@@ -80,7 +74,7 @@ def main(opt):
             if not txt:
                 raise ValueError("empty conv")
 
-            prompt = f"{system_prompt}Conversation:\n{txt}\n\nAnswer:"
+            prompt = f"{system_prompt}Conversation:\n{txt}\n\nYour answer (A, B, C, D, E, F, G, H, I, J, K, or L):"
             inputs = proc(images=grid, text=prompt, return_tensors="pt")
             
             # Fixed: Only move to device, don't change dtype for all tensors
@@ -91,13 +85,13 @@ def main(opt):
             with torch.no_grad():
                 out_ids = model.generate(
                     **inputs, 
-                    max_new_tokens=5,   # Give it a bit more room
+                    max_new_tokens=2,   # Very restrictive - just 1-2 tokens max
                     min_new_tokens=1,   
-                    do_sample=True,     # Add some randomness to avoid always picking A
-                    temperature=0.3,    # Low but not zero temperature
-                    top_p=0.9,          # Nucleus sampling
+                    do_sample=True,     
+                    temperature=0.1,    # Very low temperature for more deterministic
                     pad_token_id=proc.tokenizer.eos_token_id,
-                    eos_token_id=proc.tokenizer.eos_token_id
+                    eos_token_id=proc.tokenizer.eos_token_id,
+                    bad_words_ids=[[proc.tokenizer.encode("Conversation")[0]]]  # Prevent "Conversation"
                 )
             
             # Extract only the generated tokens (not the input prompt)
