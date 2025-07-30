@@ -1,4 +1,4 @@
-
+# call_llava_fixed.py  ── Fixed LLaVA 1.6 script for tangram classification
 import argparse, ast, warnings, json, re, pandas as pd, torch
 from PIL import Image
 from tqdm import tqdm
@@ -60,11 +60,11 @@ def main(opt):
 
     grid_img = Image.open(opt.image_path).convert("RGB")
 
-    # Try different prompt to avoid A-bias
+    # Try reverse psychology - avoid mentioning A first
     SYSTEM_PROMPT = (
-        "You see tangram shapes in this image, each marked with a letter. "
-        "Someone is describing one specific shape in the conversation below. "
-        "Which letter corresponds to the described shape? Respond with just the letter."
+        "Study this image with tangram shapes labeled with letters. "
+        "Read the conversation describing one shape. "
+        "What letter identifies the shape being described?"
     )
 
     rows_out = []
