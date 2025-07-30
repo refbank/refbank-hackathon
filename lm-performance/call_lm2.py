@@ -59,10 +59,15 @@ def main(opt):
     grid = Image.open(opt.image_path).convert("RGB")
 
     system_prompt = (
-        "Look at the image grid showing tangrams labeled A through L. "
-        "Read the conversation below where someone describes one of these tangrams. "
-        "Which tangram (A, B, C, D, E, F, G, H, I, J, K, or L) matches the description?\n\n"
-        "Conversation:\n"
+        "Look at this image with tangrams labeled A through L. "
+        "Read each conversation and identify which tangram is being described.\n\n"
+        "Example:\n"
+        "Conversation: 'This looks like a house with a triangle roof'\n"
+        "Answer: C\n\n"
+        "Example:\n" 
+        "Conversation: 'I see a bird flying with wings spread'\n"
+        "Answer: F\n\n"
+        "Now your turn:\n"
     )
 
     rows_out = []
@@ -75,7 +80,7 @@ def main(opt):
             if not txt:
                 raise ValueError("empty conv")
 
-            prompt = f"{system_prompt}{txt}\n\nAnswer: The tangram being described is"
+            prompt = f"{system_prompt}Conversation:\n{txt}\n\nAnswer:"
             inputs = proc(images=grid, text=prompt, return_tensors="pt")
             
             # Fixed: Only move to device, don't change dtype for all tensors
