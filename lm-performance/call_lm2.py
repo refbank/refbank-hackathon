@@ -45,7 +45,7 @@ def extract_letter_prediction(text):
     import re
     
     # Clean the text first
-    text = text.strip()
+    text = text.strip().upper()  # Convert to uppercase
     
     # Look for a standalone letter A-L
     match = re.search(r'\b([A-L])\b', text)
@@ -115,8 +115,8 @@ def main(opt):
                     max_new_tokens=3,   # Just enough for " A" or " B"
                     min_new_tokens=1,   
                     do_sample=True,     
-                    temperature=0.8,    # Higher temperature for more variety
-                    top_p=0.9,         # Nucleus sampling
+                    temperature=1.0,    # Even higher temperature for more variety
+                    top_p=0.8,         # Slightly more restrictive nucleus sampling
                     pad_token_id=proc.tokenizer.eos_token_id,
                     eos_token_id=proc.tokenizer.eos_token_id,
                 )
