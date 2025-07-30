@@ -108,10 +108,10 @@ def main(opt):
             with torch.no_grad():
                 out_ids = model.generate(
                     **inputs, 
-                    max_new_tokens=3,   # Just enough for " A" or " B"
+                    max_new_tokens=2,   
                     min_new_tokens=1,   
                     do_sample=True,     
-                    temperature=0.9,    # Lower temperature for more consistent responses
+                    temperature=0.7,    # Lower temperature for more consistent responses
                     top_p=0.9,         # Back to higher top_p
                     pad_token_id=proc.tokenizer.eos_token_id,
                     eos_token_id=proc.tokenizer.eos_token_id,
@@ -138,7 +138,7 @@ def main(opt):
             })
             
             # Debug output for first few trials
-            if idx < 5:
+            if idx < 6:
                 print(f"\nTrial {idx} (id={row['trial_id']}):")
                 print(f"  Target: {row['target']}")
                 print(f"  Raw output: '{pred_raw}'")
