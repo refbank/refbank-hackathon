@@ -1,7 +1,7 @@
 import argparse, ast, warnings, re, pandas as pd, torch
 from PIL import Image
 from tqdm import tqdm
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import Blip2Processor, Blip2ForConditionalGeneration
 
 warnings.filterwarnings("ignore", category=UserWarning)
 LETTER_RE = re.compile(r"\b([A-L])\b")
@@ -38,12 +38,10 @@ def extract_letter(text: str) -> str:
 def main(opt):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
-    # Load Moondream2
-    model_id = "vikhyatk/moondream2"
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
-    model = AutoModelForCausalLM.from_pretrained(
-        model_id, 
-        trust_remote_code=True,
+    # Load BLIP-2
+    processor = Blip2Processor.from_pretrained("Salesforce/blip2-opt-2.7b")
+    model = Blip2ForConditionalGeneration.from_pretrained(
+        "Salesforce/blip2-opt-2.7b",
         torch_dtype=torch.float16,
         device_map="auto"
     ).eval()
@@ -65,16 +63,31 @@ def main(opt):
             if not conv_text:
                 raise ValueError("empty conv")
 
-            # Create question for Moondream2
+            # Create question for BLIP-2
             question = (
-                f"Look at the tangram pieces labeled A through L in this image. "
+                f"Question: Look at the tangram pieces labeled A through L. "
                 f"Based on this conversation, which letter corresponds to the described shape? "
-                f"Answer with just the letter.\n\nConversation:\n{conv_text}"
+                f"Answer with one letter only. Conversation: {conv_text[:500]} Answer:"
             )
             
-            # Generate response with Moondream2
+            # Process with BLIP-2
+            inputs = processor(grid_img, question, return_tensors="pt").to(device)
+            
             with torch.no_grad():
-                response = model.answer_question(grid_img, question, tokenizer)
+                generated_ids = model.generate(
+                    **inputs,
+                    max_new_tokens=5,
+                    min_length=1,
+                    do_sample=False,  # Greedy decoding
+                    num_beams=1,
+                    early_stopping=True
+                )
+            
+            response = processor.decode(generated_ids[0], skip_special_tokens=True)
+            # BLIP-2 often includes the question in output, so extract just the answer
+            if "Answer:" in response:
+                response = response.split("Answer:")[-1].strip()
+            
             pred_letter = extract_letter(response)
             valid = pred_letter in "ABCDEFGHIJKL"
 
@@ -104,7 +117,7 @@ def main(opt):
             })
 
     # Save results
-    out_csv = f"model_choices-moondream2-{opt.experiment_name}-{opt.history_type}.csv"
+    out_csv = f"model_choices-blip2-{opt.experiment_name}-{opt.history_type}.csv"
     
     if not rows_out:
         print("No predictions were made!")
