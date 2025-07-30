@@ -79,10 +79,10 @@ def main(opt):
     
     grid = Image.open(opt.image_path).convert("RGB")
 
-    # Try a completely different approach - avoid any ordering or listing
+    # Try a completely different approach
     system_prompt = (
-        "Study and look at the 12 images showing tangram puzzle pieces labeled A,B,C,D,E,F,G,H,I,J,K,L.\n"
-        "Read and analyze the conversation describing ONE of the 12 tangram piece.\n"
+        "Study, analyze and look at the 12 images showing tangram puzzle pieces labeled A,B,C,D,E,F,G,H,I,J,K,L.\n"
+        "Read and analyze the conversation describing one of the twelve tangram piece.\n"
         "Identify which tangram piece is being described by its label letter (A,B,C,D,E,F,G,H,I,J,K,L).\n\n"
     )
 
@@ -111,7 +111,7 @@ def main(opt):
                     max_new_tokens=3,   
                     min_new_tokens=1,   
                     do_sample=True,     
-                    temperature=0.3,    # Lower temperature for more consistent responses
+                    temperature=0.5,    # Lower temperature for more consistent responses
                     top_p=0.9,         # Back to higher top_p
                     pad_token_id=proc.tokenizer.eos_token_id,
                     eos_token_id=proc.tokenizer.eos_token_id,
