@@ -115,8 +115,8 @@ def main(opt):
                     max_new_tokens=3,   # Just enough for " A" or " B"
                     min_new_tokens=1,   
                     do_sample=True,     
-                    temperature=1.0,    # Even higher temperature for more variety
-                    top_p=0.8,         # Slightly more restrictive nucleus sampling
+                    temperature=0.3,    # Lower temperature for more consistent responses
+                    top_p=0.9,         # Back to higher top_p
                     pad_token_id=proc.tokenizer.eos_token_id,
                     eos_token_id=proc.tokenizer.eos_token_id,
                 )
