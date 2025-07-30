@@ -51,9 +51,9 @@ def main(opt):
 
     df   = pd.read_csv(opt.data_path)
     
-    # TEST MODE: Use only first 5 rows for quick testing
+    # TEST MODE: Use first 20 rows to check for variety in responses
     print(f"Original dataset has {len(df)} rows")
-    df = df.head(5)
+    df = df.head(20)  # Test with more rows to see response variety
     print(f"Testing with {len(df)} rows only")
     
     grid = Image.open(opt.image_path).convert("RGB")
@@ -91,10 +91,11 @@ def main(opt):
             with torch.no_grad():
                 out_ids = model.generate(
                     **inputs, 
-                    max_new_tokens=3,   # Very short - just enough for " A" or " B"
+                    max_new_tokens=5,   # Give it a bit more room
                     min_new_tokens=1,   
-                    do_sample=False,
-                    temperature=0.0,
+                    do_sample=True,     # Add some randomness to avoid always picking A
+                    temperature=0.3,    # Low but not zero temperature
+                    top_p=0.9,          # Nucleus sampling
                     pad_token_id=proc.tokenizer.eos_token_id,
                     eos_token_id=proc.tokenizer.eos_token_id
                 )
@@ -133,8 +134,22 @@ def main(opt):
         total = len(rows_out)
         accuracy = correct / total * 100
         
+        # Check for suspicious patterns
+        predictions = [row["model_choice"] for row in rows_out]
+        unique_predictions = set(predictions)
+        
         print(f"saved → {out_csv}   ({total} rows)")
         print(f"Accuracy: {correct}/{total} = {accuracy:.2f}%")
+        print(f"Unique predictions: {unique_predictions}")
+        print(f"Total unique responses: {len(unique_predictions)}")
+        
+        # Count frequency of each prediction
+        from collections import Counter
+        pred_counts = Counter(predictions)
+        print("Prediction frequency:")
+        for pred, count in pred_counts.most_common():
+            print(f"  '{pred}': {count} times ({count/total*100:.1f}%)")
+            
     else:
         print(f"saved → {out_csv}   (0 rows) - No successful predictions!")
 
