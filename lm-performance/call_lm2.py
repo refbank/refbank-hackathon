@@ -59,11 +59,10 @@ def main(opt):
     grid = Image.open(opt.image_path).convert("RGB")
 
     system_prompt = (
-        "You are shown a conversation between a describer and matcher trying to identify an image "
-        "among labeled options (A to L).\n"
-        "Based on the conversation and the image, guess which tangram (labeled A to L) is being described.\n"
-        "Answer with a single capital letter from A to L. Do not explain.\n\n"
-        "Your answer:"
+        "Look at the image grid showing tangrams labeled A through L. "
+        "Read the conversation below where someone describes one of these tangrams. "
+        "Which tangram (A, B, C, D, E, F, G, H, I, J, K, or L) matches the description?\n\n"
+        "Conversation:\n"
     )
 
     rows_out = []
@@ -76,7 +75,7 @@ def main(opt):
             if not txt:
                 raise ValueError("empty conv")
 
-            prompt = f"{system_prompt}\n\n{txt}"
+            prompt = f"{system_prompt}{txt}\n\nAnswer: The tangram being described is"
             inputs = proc(images=grid, text=prompt, return_tensors="pt")
             
             # Fixed: Only move to device, don't change dtype for all tensors
@@ -87,11 +86,12 @@ def main(opt):
             with torch.no_grad():
                 out_ids = model.generate(
                     **inputs, 
-                    max_new_tokens=10,  # Give it a bit more room
-                    min_new_tokens=1,   # Force it to generate at least something
+                    max_new_tokens=3,   # Very short - just enough for " A" or " B"
+                    min_new_tokens=1,   
                     do_sample=False,
-                    temperature=0.0,    # Make it deterministic
-                    pad_token_id=proc.tokenizer.eos_token_id
+                    temperature=0.0,
+                    pad_token_id=proc.tokenizer.eos_token_id,
+                    eos_token_id=proc.tokenizer.eos_token_id
                 )
             
             # Extract only the generated tokens (not the input prompt)
