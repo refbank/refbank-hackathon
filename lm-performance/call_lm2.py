@@ -2,6 +2,7 @@ import argparse, ast, warnings, pandas as pd, torch
 from PIL import Image
 from tqdm import tqdm
 from transformers import AutoProcessor, IdeficsForVisionText2Text
+import random
 
 warnings.filterwarnings("ignore", category=UserWarning)   # silence HF chatter
 
@@ -39,17 +40,37 @@ def _flatten(obj):
 def _to_chat_str(msg_dicts):
     return "\n".join(f"{d.get('role','?')}: {d.get('text','')}" for d in msg_dicts)
 
+def extract_letter_prediction(text):
+    """Extract the most likely letter prediction from model output"""
+    import re
+    
+    # Clean the text first
+    text = text.strip()
+    
+    # Look for a standalone letter A-L
+    match = re.search(r'\b([A-L])\b', text)
+    if match:
+        return match.group(1)
+    
+    # Look for any A-L letter
+    match = re.search(r'([A-L])', text)
+    if match:
+        return match.group(1)
+    
+    # If no valid letter found, return the original text for debugging
+    return text
+
 # ---------- main -------------------------------------------------------
 def main(opt):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    dtype  = torch.float16
+    dtype = torch.float16
 
-    proc  = AutoProcessor.from_pretrained(opt.model)
+    proc = AutoProcessor.from_pretrained(opt.model)
     model = IdeficsForVisionText2Text.from_pretrained(
         opt.model, device_map="auto", torch_dtype=dtype
     ).eval()
 
-    df   = pd.read_csv(opt.data_path)
+    df = pd.read_csv(opt.data_path)
     
     # TEST MODE: Use first 50 rows to get better statistics
     print(f"Original dataset has {len(df)} rows")
@@ -58,10 +79,15 @@ def main(opt):
     
     grid = Image.open(opt.image_path).convert("RGB")
 
+    # Try a completely different approach - use few-shot with randomized examples
     system_prompt = (
-        "Look at the image showing tangram shapes with labels.\n"
-        "Read the conversation where someone describes one specific tangram.\n"
-        "Which tangram matches the description? Choose one letter.\n\n"
+        "Look at the image showing tangram puzzle pieces labeled A through L.\n"
+        "Read the conversation and identify which tangram is being described.\n\n"
+        "Examples:\n"
+        "Conversation: 'This looks like a house with a pointed roof'\n"
+        "Answer: H\n\n"
+        "Conversation: 'I see a bird flying to the right'\n"
+        "Answer: C\n\n"
     )
 
     rows_out = []
@@ -74,10 +100,11 @@ def main(opt):
             if not txt:
                 raise ValueError("empty conv")
 
-            prompt = f"{system_prompt}Conversation:\n{txt}\n\nAnswer:"
+            # Simple, direct prompt
+            prompt = f"{system_prompt}Conversation: {txt}\nAnswer:"
             inputs = proc(images=grid, text=prompt, return_tensors="pt")
             
-            # Fixed: Only move to device, don't change dtype for all tensors
+            # Move to device only (no dtype conversion for input tensors)
             for k, v in inputs.items():
                 if torch.is_tensor(v):
                     inputs[k] = v.to(device)
@@ -85,31 +112,42 @@ def main(opt):
             with torch.no_grad():
                 out_ids = model.generate(
                     **inputs, 
-                    max_new_tokens=2,   # Very restrictive - just 1-2 tokens max
+                    max_new_tokens=3,   # Just enough for " A" or " B"
                     min_new_tokens=1,   
                     do_sample=True,     
-                    temperature=0.1,    # Very low temperature for more deterministic
+                    temperature=0.8,    # Higher temperature for more variety
+                    top_p=0.9,         # Nucleus sampling
                     pad_token_id=proc.tokenizer.eos_token_id,
                     eos_token_id=proc.tokenizer.eos_token_id,
-                    bad_words_ids=[[proc.tokenizer.encode("Conversation")[0]]]  # Prevent "Conversation"
                 )
             
-            # Extract only the generated tokens (not the input prompt)
+            # Extract only the generated tokens
             input_length = inputs['input_ids'].shape[1]
             generated_ids = out_ids[:, input_length:]
-            pred = proc.batch_decode(generated_ids, skip_special_tokens=True)[0].strip()
-
-            # Extract just the first A-L letter from prediction for accuracy
-            import re
-            pred_clean = re.search(r'[A-L]', pred)
-            pred_letter = pred_clean.group(0) if pred_clean else pred
+            pred_raw = proc.batch_decode(generated_ids, skip_special_tokens=True)[0]
+            
+            # Extract clean letter prediction
+            pred_letter = extract_letter_prediction(pred_raw)
+            
+            # Validate it's a single letter A-L
+            is_valid = pred_letter in 'ABCDEFGHIJKL' and len(pred_letter) == 1
             
             rows_out.append({
                 "trial_id": row["trial_id"], 
-                "model_choice": pred,
+                "model_choice_raw": pred_raw,
+                "model_choice": pred_letter,
                 "target": row["target"],
-                "correct": pred_letter == row["target"]
+                "correct": is_valid and pred_letter == row["target"],
+                "valid_format": is_valid
             })
+            
+            # Debug output for first few trials
+            if idx < 5:
+                print(f"\nTrial {idx} (id={row['trial_id']}):")
+                print(f"  Target: {row['target']}")
+                print(f"  Raw output: '{pred_raw}'")
+                print(f"  Extracted: '{pred_letter}'")
+                print(f"  Valid: {is_valid}")
 
         except Exception as e:
             print(f"trial {idx} (id={row.get('trial_id', '?')}): {e}")
@@ -122,28 +160,44 @@ def main(opt):
     results_df = pd.DataFrame(rows_out)
     results_df.to_csv(out_csv, index=False)
     
-    # Calculate and print accuracy (now much faster)
+    # Enhanced analysis
     if len(rows_out) > 0:
         correct = sum(row["correct"] for row in rows_out)
+        valid_format = sum(row["valid_format"] for row in rows_out)
         total = len(rows_out)
         accuracy = correct / total * 100
+        format_accuracy = valid_format / total * 100
         
-        # Check for suspicious patterns
-        predictions = [row["model_choice"] for row in rows_out]
-        unique_predictions = set(predictions)
+        # Analyze response distribution
+        predictions = [row["model_choice"] for row in rows_out if row["valid_format"]]
         
-        print(f"saved → {out_csv}   ({total} rows)")
+        print(f"\nsaved → {out_csv}   ({total} rows)")
         print(f"Accuracy: {correct}/{total} = {accuracy:.2f}%")
-        print(f"Unique predictions: {unique_predictions}")
-        print(f"Total unique responses: {len(unique_predictions)}")
+        print(f"Valid format: {valid_format}/{total} = {format_accuracy:.2f}%")
+        print(f"Random baseline: {100/12:.2f}%")
         
-        # Count frequency of each prediction
-        from collections import Counter
-        pred_counts = Counter(predictions)
-        print("Prediction frequency:")
-        for pred, count in pred_counts.most_common():
-            print(f"  '{pred}': {count} times ({count/total*100:.1f}%)")
+        if predictions:
+            from collections import Counter
+            pred_counts = Counter(predictions)
+            print(f"\nValid predictions distribution:")
+            for letter in 'ABCDEFGHIJKL':
+                count = pred_counts.get(letter, 0)
+                if count > 0:
+                    print(f"  {letter}: {count} times ({count/len(predictions)*100:.1f}%)")
             
+            # Check for bias - flag if any letter appears >30% of the time
+            max_freq = max(pred_counts.values()) if pred_counts else 0
+            if max_freq > len(predictions) * 0.3:
+                most_common = pred_counts.most_common(1)[0]
+                print(f"\n⚠️  WARNING: Possible bias detected - '{most_common[0]}' appears {most_common[1]/len(predictions)*100:.1f}% of the time")
+        
+        # Show some examples of what went wrong
+        invalid_responses = [row for row in rows_out if not row["valid_format"]]
+        if invalid_responses:
+            print(f"\nSample invalid responses:")
+            for i, row in enumerate(invalid_responses[:3]):
+                print(f"  {i+1}. Raw: '{row['model_choice_raw']}' → Extracted: '{row['model_choice']}'")
+                
     else:
         print(f"saved → {out_csv}   (0 rows) - No successful predictions!")
 
@@ -153,6 +207,6 @@ if __name__ == "__main__":
     p.add_argument("--model", required=True)
     p.add_argument("--experiment_name", required=True)
     p.add_argument("--history_type", choices=["yoked", "none"], default="yoked")
-    p.add_argument("--data_path",  default="trials_with_history.csv")
+    p.add_argument("--data_path", default="trials_with_history.csv")
     p.add_argument("--image_path", default="compiled_grid.png")
     main(p.parse_args())
