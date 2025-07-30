@@ -50,6 +50,12 @@ def main(opt):
     ).eval()
 
     df   = pd.read_csv(opt.data_path)
+    
+    # TEST MODE: Use only first 5 rows for quick testing
+    print(f"Original dataset has {len(df)} rows")
+    df = df.head(5)
+    print(f"Testing with {len(df)} rows only")
+    
     grid = Image.open(opt.image_path).convert("RGB")
 
     system_prompt = (
