@@ -81,9 +81,9 @@ def main(opt):
 
     # Try a completely different approach - avoid any ordering or listing
     system_prompt = (
-        "Study the image showing tangram puzzle pieces.\n"
+        "Study the 12 images showing tangram puzzle pieces labeled A,B,C,D,E,F,G,H,I,J,K, L.\n"
         "Read the conversation describing one tangram piece.\n"
-        "Identify which piece is being described by its label letter.\n\n"
+        "Identify which tangram piece is being described by its label letter (A,B,C,D,E,F,G,H,I,J,K, L).\n\n"
     )
 
     rows_out = []
