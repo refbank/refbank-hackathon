@@ -1,4 +1,4 @@
-# call_llava.py  ── LLaVA 1.6 replacement for your previous Idefics script
+
 import argparse, ast, warnings, json, re, pandas as pd, torch
 from PIL import Image
 from tqdm import tqdm
@@ -60,14 +60,15 @@ def main(opt):
 
     grid_img = Image.open(opt.image_path).convert("RGB")
 
+    # Fixed prompt with proper image token placement
     SYSTEM_PROMPT = (
-        "You are shown a conversation between a describer and matcher that refers to an image "
-        "grid of tangram puzzle pieces labelled A–L. "
-        "Based on **both** the conversation and the image, output **one capital letter (A–L)** "
-        "that matches the describer’s target. No explanation."
+        "Look at this image showing tangram puzzle pieces labeled A through L. "
+        "Based on the conversation below, which tangram piece is being described? "
+        "Answer with only one letter A-L."
     )
 
     rows_out = []
+    successful_predictions = 0
 
     for idx, row in tqdm(df.iterrows(), total=len(df), desc="trials"):
         try:
@@ -76,25 +77,44 @@ def main(opt):
             if not conv_text:
                 raise ValueError("empty conv")
 
-            prompt = f"{SYSTEM_PROMPT}\n\nConversation:\n{conv_text}\n\nAnswer:"
-            # LLaVA expects lists for images/text
-            inputs = processor(text=[prompt], images=[grid_img], return_tensors="pt")
+            # Create the prompt with proper format for LLaVA
+            conversation = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image"},
+                        {"type": "text", "text": f"{SYSTEM_PROMPT}\n\nConversation:\n{conv_text}\n\nAnswer:"}
+                    ]
+                }
+            ]
+            
+            # Apply chat template
+            prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
+            
+            # Process inputs - LLaVA expects the image and text separately
+            inputs = processor(
+                text=prompt, 
+                images=grid_img, 
+                return_tensors="pt",
+                padding=True
+            )
             inputs = {k: v.to(device) if torch.is_tensor(v) else v for k, v in inputs.items()}
 
             with torch.no_grad():
                 generated_ids = model.generate(
                     **inputs,
-                    max_new_tokens=5,
+                    max_new_tokens=10,
                     min_new_tokens=1,
-                    temperature=0.5,
+                    do_sample=True,
+                    temperature=0.3,
                     top_p=0.9,
                     pad_token_id=processor.tokenizer.eos_token_id,
                     eos_token_id=processor.tokenizer.eos_token_id,
                 )
 
-            # strip the prompt tokens
-            pred_raw = processor.batch_decode(generated_ids[:, inputs['input_ids'].shape[1]:],
-                                              skip_special_tokens=True)[0]
+            # Strip the prompt tokens to get only the generated response
+            new_tokens = generated_ids[:, inputs['input_ids'].shape[1]:]
+            pred_raw = processor.batch_decode(new_tokens, skip_special_tokens=True)[0].strip()
             pred_letter = extract_letter(pred_raw)
             valid = pred_letter in "ABCDEFGHIJKL"
 
@@ -107,38 +127,61 @@ def main(opt):
                 "valid_format": valid
             })
 
+            successful_predictions += 1
+
             if idx < 6:  # preview first few
                 print(f"\nTrial {idx} id={row['trial_id']}  tgt={row['target']}  raw='{pred_raw}'  → {pred_letter}")
 
         except Exception as err:
             print(f"trial {idx} (id={row.get('trial_id','?')}): {err}")
+            # Add a failed row to maintain consistent DataFrame structure
+            rows_out.append({
+                "trial_id": row.get("trial_id", f"unknown_{idx}"),
+                "model_choice_raw": f"ERROR: {str(err)}",
+                "model_choice": "?",
+                "target": row.get("target", "?"),
+                "correct": False,
+                "valid_format": False
+            })
 
     # ---------- write + stats -------------------------------------------
     out_csv = (
         f"model_choices-{opt.model.replace('/','--')}-"
         f"{opt.experiment_name}-llava-{opt.history_type}.csv"
     )
+    
+    # Create DataFrame even if all predictions failed
+    if not rows_out:
+        print("No predictions were made!")
+        return
+        
     res_df = pd.DataFrame(rows_out)
     res_df.to_csv(out_csv, index=False)
 
     total = len(res_df)
     correct = res_df["correct"].sum()
-    valid   = res_df["valid_format"].sum()
-    print(f"\nsaved → {out_csv}   ({total} rows)")
+    valid = res_df["valid_format"].sum()
+    
+    print(f"\nSaved → {out_csv} ({total} rows)")
+    print(f"Successful predictions: {successful_predictions}/{total}")
     print(f"Accuracy: {correct}/{total} = {correct/total*100:.2f}%")
     print(f"Valid format: {valid}/{total} = {valid/total*100:.2f}%")
     print(f"Random baseline: {100/12:.2f}%")
 
-    if valid:
+    if valid > 0:
         from collections import Counter
-        dist = Counter(res_df.loc[res_df.valid_format, "model_choice"])
+        valid_predictions = res_df[res_df["valid_format"]]
+        dist = Counter(valid_predictions["model_choice"])
         print("\nPrediction distribution (valid only):")
         for l in "ABCDEFGHIJKL":
-            if dist[l]:
+            if dist[l] > 0:
                 print(f"  {l}: {dist[l]} ({dist[l]/valid*100:.1f}%)")
-        if max(dist.values()) > valid * 0.3:
+        
+        if valid > 0 and max(dist.values()) > valid * 0.3:
             mc = dist.most_common(1)[0]
             print(f"\n⚠️  Bias warning – '{mc[0]}' appears {mc[1]/valid*100:.1f}% of valid predictions")
+    else:
+        print("\nNo valid predictions to analyze distribution")
 
 
 # ---------- CLI --------------------------------------------------------
