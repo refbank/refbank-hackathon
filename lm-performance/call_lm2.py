@@ -62,7 +62,8 @@ def main(opt):
         "You are shown a conversation between a describer and matcher trying to identify an image "
         "among labeled options (A to L).\n"
         "Based on the conversation and the image, guess which tangram (labeled A to L) is being described.\n"
-        "Answer with a single capital letter from A to L. Do not explain."
+        "Answer with a single capital letter from A to L. Do not explain.\n\n"
+        "Your answer:"
     )
 
     rows_out = []
@@ -84,7 +85,14 @@ def main(opt):
                     inputs[k] = v.to(device)
             
             with torch.no_grad():
-                out_ids = model.generate(**inputs, max_new_tokens=5, do_sample=False)
+                out_ids = model.generate(
+                    **inputs, 
+                    max_new_tokens=10,  # Give it a bit more room
+                    min_new_tokens=1,   # Force it to generate at least something
+                    do_sample=False,
+                    temperature=0.0,    # Make it deterministic
+                    pad_token_id=proc.tokenizer.eos_token_id
+                )
             
             # Extract only the generated tokens (not the input prompt)
             input_length = inputs['input_ids'].shape[1]
