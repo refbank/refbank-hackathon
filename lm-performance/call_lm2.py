@@ -79,15 +79,11 @@ def main(opt):
     
     grid = Image.open(opt.image_path).convert("RGB")
 
-    # Try a completely different approach - use few-shot with randomized examples
+    # Try a completely different approach - avoid any ordering or listing
     system_prompt = (
-        "Look at the image showing tangram puzzle pieces labeled A through L.\n"
-        "Read the conversation and identify which tangram is being described.\n\n"
-        "Examples:\n"
-        "Conversation: 'This looks like a house with a pointed roof'\n"
-        "Answer: H\n\n"
-        "Conversation: 'I see a bird flying to the right'\n"
-        "Answer: C\n\n"
+        "Study the image showing tangram puzzle pieces.\n"
+        "Read the conversation describing one tangram piece.\n"
+        "Identify which piece is being described by its label letter.\n\n"
     )
 
     rows_out = []
@@ -100,8 +96,8 @@ def main(opt):
             if not txt:
                 raise ValueError("empty conv")
 
-            # Simple, direct prompt
-            prompt = f"{system_prompt}Conversation: {txt}\nAnswer:"
+            # Even simpler prompt - no examples that might bias toward specific letters
+            prompt = f"{system_prompt}Conversation:\n{txt}\n\nThe label is:"
             inputs = proc(images=grid, text=prompt, return_tensors="pt")
             
             # Move to device only (no dtype conversion for input tensors)
