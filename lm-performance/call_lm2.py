@@ -51,17 +51,17 @@ def main(opt):
 
     df   = pd.read_csv(opt.data_path)
     
-    # TEST MODE: Use first 20 rows to check for variety in responses
+    # TEST MODE: Use first 50 rows to get better statistics
     print(f"Original dataset has {len(df)} rows")
-    df = df.head(20)  # Test with more rows to see response variety
+    df = df.head(50)  # More rows for better pattern detection
     print(f"Testing with {len(df)} rows only")
     
     grid = Image.open(opt.image_path).convert("RGB")
 
     system_prompt = (
-        "You are looking at an image with 12 tangram shapes labeled A, B, C, D, E, F, G, H, I, J, K, and L.\n"
-        "Based on the conversation below, choose which tangram letter (A through L) best matches the description.\n"
-        "Respond with only the single letter, nothing else.\n\n"
+        "Look at the image showing tangram shapes with labels.\n"
+        "Read the conversation where someone describes one specific tangram.\n"
+        "Which tangram matches the description? Choose one letter.\n\n"
     )
 
     rows_out = []
@@ -74,7 +74,7 @@ def main(opt):
             if not txt:
                 raise ValueError("empty conv")
 
-            prompt = f"{system_prompt}Conversation:\n{txt}\n\nYour answer (A, B, C, D, E, F, G, H, I, J, K, or L):"
+            prompt = f"{system_prompt}Conversation:\n{txt}\n\nAnswer:"
             inputs = proc(images=grid, text=prompt, return_tensors="pt")
             
             # Fixed: Only move to device, don't change dtype for all tensors
