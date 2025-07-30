@@ -60,11 +60,11 @@ def main(opt):
 
     grid_img = Image.open(opt.image_path).convert("RGB")
 
-    # Fixed prompt with proper image token placement
+    # Try different prompt to avoid A-bias
     SYSTEM_PROMPT = (
-        "Look at this image showing tangram puzzle pieces labeled A through L. "
-        "Based on the conversation below, which tangram piece is being described? "
-        "Answer with only one letter A-L."
+        "You see tangram shapes in this image, each marked with a letter. "
+        "Someone is describing one specific shape in the conversation below. "
+        "Which letter corresponds to the described shape? Respond with just the letter."
     )
 
     rows_out = []
@@ -103,11 +103,12 @@ def main(opt):
             with torch.no_grad():
                 generated_ids = model.generate(
                     **inputs,
-                    max_new_tokens=10,
+                    max_new_tokens=5,
                     min_new_tokens=1,
                     do_sample=True,
-                    temperature=0.3,
-                    top_p=0.9,
+                    temperature=0.7,  # Higher temperature for more variety
+                    top_p=0.8,
+                    top_k=20,  # Add top_k sampling
                     pad_token_id=processor.tokenizer.eos_token_id,
                     eos_token_id=processor.tokenizer.eos_token_id,
                 )
