@@ -1,4 +1,3 @@
-
 import argparse, ast, warnings, json, re, pandas as pd, torch
 from PIL import Image
 from tqdm import tqdm
@@ -60,11 +59,11 @@ def main(opt):
 
     grid_img = Image.open(opt.image_path).convert("RGB")
 
-    # Try different prompt to avoid A-bias
+    # Different prompt approach - avoid bias
     SYSTEM_PROMPT = (
-        "You see tangram shapes in this image, each marked with a letter. "
-        "Someone is describing one specific shape in the conversation below. "
-        "Which letter corresponds to the described shape? Respond with just the letter."
+        "Look at the tangram puzzle pieces in this image. Each piece is labeled with a letter from A to L. "
+        "Based on the conversation below, identify which letter corresponds to the shape being described. "
+        "Reply with only the single letter."
     )
 
     rows_out = []
@@ -77,38 +76,27 @@ def main(opt):
             if not conv_text:
                 raise ValueError("empty conv")
 
-            # Create the prompt with proper format for LLaVA
-            conversation = [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "image"},
-                        {"type": "text", "text": f"{SYSTEM_PROMPT}\n\nConversation:\n{conv_text}\n\nAnswer:"}
-                    ]
-                }
-            ]
+            # Simpler prompt format that works better with older transformers versions
+            full_prompt = f"USER: <image>\n{SYSTEM_PROMPT}\n\nConversation:\n{conv_text}\n\nASSISTANT:"
             
-            # Apply chat template
-            prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
-            
-            # Process inputs - LLaVA expects the image and text separately
+            # Process inputs with simplified approach
             inputs = processor(
-                text=prompt, 
+                text=full_prompt, 
                 images=grid_img, 
                 return_tensors="pt",
                 padding=True
             )
+            
+            # Move to device
             inputs = {k: v.to(device) if torch.is_tensor(v) else v for k, v in inputs.items()}
 
             with torch.no_grad():
+                # Use greedy decoding to reduce bias
                 generated_ids = model.generate(
                     **inputs,
-                    max_new_tokens=5,
+                    max_new_tokens=3,
                     min_new_tokens=1,
-                    do_sample=True,
-                    temperature=0.7,  # Higher temperature for more variety
-                    top_p=0.8,
-                    top_k=20,  # Add top_k sampling
+                    do_sample=False,  # Greedy decoding
                     pad_token_id=processor.tokenizer.eos_token_id,
                     eos_token_id=processor.tokenizer.eos_token_id,
                 )
