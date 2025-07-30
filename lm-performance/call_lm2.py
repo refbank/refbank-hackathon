@@ -111,7 +111,7 @@ def main(opt):
                     max_new_tokens=3,   
                     min_new_tokens=1,   
                     do_sample=True,     
-                    temperature=0.4,    # Lower temperature for more consistent responses
+                    temperature=0.3,    # Lower temperature for more consistent responses
                     top_p=0.9,         # Back to higher top_p
                     pad_token_id=proc.tokenizer.eos_token_id,
                     eos_token_id=proc.tokenizer.eos_token_id,
