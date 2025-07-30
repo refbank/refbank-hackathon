@@ -74,7 +74,7 @@ def main(opt):
     
     # TEST MODE: Use first 50 rows to get better statistics
     print(f"Original dataset has {len(df)} rows")
-    df = df.head(300)  # More rows for better pattern detection
+    df = df.head(500)  # More rows for better pattern detection
     print(f"Testing with {len(df)} rows only")
     
     grid = Image.open(opt.image_path).convert("RGB")
