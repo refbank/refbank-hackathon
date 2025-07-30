@@ -55,7 +55,7 @@ def main(opt):
 
     # --- quick test slice ------------------------------------------------
     print(f"Original dataset has {len(df)} rows")
-    df = df.head(500)      # adjust or remove this line as desired
+    df = df.head(50)      # adjust or remove this line as desired
     print(f"Testing with {len(df)} rows")
 
     grid_img = Image.open(opt.image_path).convert("RGB")
