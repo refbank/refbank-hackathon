@@ -1,13 +1,11 @@
-import argparse, ast, warnings, json, re, pandas as pd, torch
+import argparse, ast, warnings, re, pandas as pd, torch
 from PIL import Image
 from tqdm import tqdm
-from transformers import LlavaProcessor, LlavaForConditionalGeneration
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
-warnings.filterwarnings("ignore", category=UserWarning)   # silence HF chatter
-LETTER_RE = re.compile(r"\b([A-L])\b")                    # A–L extractor
+warnings.filterwarnings("ignore", category=UserWarning)
+LETTER_RE = re.compile(r"\b([A-L])\b")
 
-
-# ---------- helpers ----------------------------------------------------
 def _flatten(obj):
     """Recursively collect dicts inside lists/strings → list[dict]"""
     if obj is None or (isinstance(obj, float) and pd.isna(obj)):
@@ -30,41 +28,32 @@ def _flatten(obj):
             out.append(x)
     return out[::-1]
 
-
 def _to_chat_str(dicts):
     return "\n".join(f"{d.get('role', '?')}: {d.get('text','')}" for d in dicts)
-
 
 def extract_letter(text: str) -> str:
     m = LETTER_RE.search(text.upper().strip())
     return m.group(1) if m else "?"
 
-
-# ---------- main -------------------------------------------------------
 def main(opt):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    dtype  = torch.float16
-
-    processor = LlavaProcessor.from_pretrained(opt.model)
-    model = LlavaForConditionalGeneration.from_pretrained(
-        opt.model, device_map="auto", torch_dtype=dtype
+    
+    # Load Moondream2
+    model_id = "vikhyatk/moondream2"
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_id, 
+        trust_remote_code=True,
+        torch_dtype=torch.float16,
+        device_map="auto"
     ).eval()
 
     df = pd.read_csv(opt.data_path)
-
-    # --- quick test slice ------------------------------------------------
     print(f"Original dataset has {len(df)} rows")
-    df = df.head(50)      # adjust or remove this line as desired
+    df = df.head(50)
     print(f"Testing with {len(df)} rows")
 
     grid_img = Image.open(opt.image_path).convert("RGB")
-
-    # Different prompt approach - avoid bias
-    SYSTEM_PROMPT = (
-        "Look at the tangram puzzle pieces in this image. Each piece is labeled with a letter from A to L. "
-        "Based on the conversation below, identify which letter corresponds to the shape being described. "
-        "Reply with only the single letter."
-    )
 
     rows_out = []
     successful_predictions = 0
@@ -76,40 +65,22 @@ def main(opt):
             if not conv_text:
                 raise ValueError("empty conv")
 
-            # Simpler prompt format that works better with older transformers versions
-            full_prompt = f"USER: <image>\n{SYSTEM_PROMPT}\n\nConversation:\n{conv_text}\n\nASSISTANT:"
-            
-            # Process inputs with simplified approach
-            inputs = processor(
-                text=full_prompt, 
-                images=grid_img, 
-                return_tensors="pt",
-                padding=True
+            # Create question for Moondream2
+            question = (
+                f"Look at the tangram pieces labeled A through L in this image. "
+                f"Based on this conversation, which letter corresponds to the described shape? "
+                f"Answer with just the letter.\n\nConversation:\n{conv_text}"
             )
             
-            # Move to device
-            inputs = {k: v.to(device) if torch.is_tensor(v) else v for k, v in inputs.items()}
-
+            # Generate response with Moondream2
             with torch.no_grad():
-                # Use greedy decoding to reduce bias
-                generated_ids = model.generate(
-                    **inputs,
-                    max_new_tokens=3,
-                    min_new_tokens=1,
-                    do_sample=False,  # Greedy decoding
-                    pad_token_id=processor.tokenizer.eos_token_id,
-                    eos_token_id=processor.tokenizer.eos_token_id,
-                )
-
-            # Strip the prompt tokens to get only the generated response
-            new_tokens = generated_ids[:, inputs['input_ids'].shape[1]:]
-            pred_raw = processor.batch_decode(new_tokens, skip_special_tokens=True)[0].strip()
-            pred_letter = extract_letter(pred_raw)
+                response = model.answer_question(grid_img, question, tokenizer)
+            pred_letter = extract_letter(response)
             valid = pred_letter in "ABCDEFGHIJKL"
 
             rows_out.append({
                 "trial_id": row["trial_id"],
-                "model_choice_raw": pred_raw,
+                "model_choice_raw": response.strip(),
                 "model_choice": pred_letter,
                 "target": row["target"],
                 "correct": valid and pred_letter == row["target"],
@@ -118,12 +89,11 @@ def main(opt):
 
             successful_predictions += 1
 
-            if idx < 6:  # preview first few
-                print(f"\nTrial {idx} id={row['trial_id']}  tgt={row['target']}  raw='{pred_raw}'  → {pred_letter}")
+            if idx < 6:
+                print(f"\nTrial {idx} id={row['trial_id']}  tgt={row['target']}  raw='{response.strip()}'  → {pred_letter}")
 
         except Exception as err:
             print(f"trial {idx} (id={row.get('trial_id','?')}): {err}")
-            # Add a failed row to maintain consistent DataFrame structure
             rows_out.append({
                 "trial_id": row.get("trial_id", f"unknown_{idx}"),
                 "model_choice_raw": f"ERROR: {str(err)}",
@@ -133,13 +103,9 @@ def main(opt):
                 "valid_format": False
             })
 
-    # ---------- write + stats -------------------------------------------
-    out_csv = (
-        f"model_choices-{opt.model.replace('/','--')}-"
-        f"{opt.experiment_name}-llava-{opt.history_type}.csv"
-    )
+    # Save results
+    out_csv = f"model_choices-moondream2-{opt.experiment_name}-{opt.history_type}.csv"
     
-    # Create DataFrame even if all predictions failed
     if not rows_out:
         print("No predictions were made!")
         return
@@ -169,15 +135,9 @@ def main(opt):
         if valid > 0 and max(dist.values()) > valid * 0.3:
             mc = dist.most_common(1)[0]
             print(f"\n⚠️  Bias warning – '{mc[0]}' appears {mc[1]/valid*100:.1f}% of valid predictions")
-    else:
-        print("\nNo valid predictions to analyze distribution")
 
-
-# ---------- CLI --------------------------------------------------------
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("--model", default="llava-hf/llava-1.6-7b-hf",
-                   help="Any open LLaVA checkpoint on HF hub")
     p.add_argument("--experiment_name", required=True)
     p.add_argument("--history_type", choices=["yoked", "none"], default="yoked")
     p.add_argument("--data_path", default="trials_with_history.csv")
