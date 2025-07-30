@@ -79,7 +79,11 @@ def main(opt):
             
             with torch.no_grad():
                 out_ids = model.generate(**inputs, max_new_tokens=5, do_sample=False)
-            pred = proc.batch_decode(out_ids, skip_special_tokens=True)[0].strip()
+            
+            # Extract only the generated tokens (not the input prompt)
+            input_length = inputs['input_ids'].shape[1]
+            generated_ids = out_ids[:, input_length:]
+            pred = proc.batch_decode(generated_ids, skip_special_tokens=True)[0].strip()
 
             # Extract just the first A-L letter from prediction for accuracy
             import re
