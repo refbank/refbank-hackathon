@@ -74,16 +74,16 @@ def main(opt):
     
     # TEST MODE: Use first 50 rows to get better statistics
     print(f"Original dataset has {len(df)} rows")
-    df = df.head(50)  # More rows for better pattern detection
+    df = df.head(100)  # More rows for better pattern detection
     print(f"Testing with {len(df)} rows only")
     
     grid = Image.open(opt.image_path).convert("RGB")
 
-    # Try completely neutral approach with no letter ordering cues
+    # Try a completely different approach - avoid any ordering or listing
     system_prompt = (
-        "You see tangram shapes in an image, each marked with a letter.\n"
-        "Someone is describing one of these shapes in a conversation.\n"
-        "Which letter marks the shape they're describing?\n\n"
+        "Study the image showing tangram puzzle pieces.\n"
+        "Read the conversation describing one tangram piece.\n"
+        "Identify which piece is being described by its label letter.\n\n"
     )
 
     rows_out = []
@@ -96,8 +96,8 @@ def main(opt):
             if not txt:
                 raise ValueError("empty conv")
 
-            # Try ending with different completion cue
-            prompt = f"{system_prompt}Conversation:\n{txt}\n\nLetter:"
+            # Even simpler prompt - no examples that might bias toward specific letters
+            prompt = f"{system_prompt}Conversation:\n{txt}\n\nThe label is:"
             inputs = proc(images=grid, text=prompt, return_tensors="pt")
             
             # Move to device only (no dtype conversion for input tensors)
