@@ -39,17 +39,15 @@ def main(opt):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     try:
-        # Try basic CLIP (should work with existing transformers)
         processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
         model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(device)
     except Exception as e:
         print(f"Failed to load CLIP: {e}")
-        print("Try: pip cache purge && pip install transformers --upgrade")
         return
 
     df = pd.read_csv(opt.data_path)
     print(f"Original dataset has {len(df)} rows")
-    df = df.head(300)
+    df = df.head(50)
     print(f"Testing with {len(df)} rows")
 
     grid_img = Image.open(opt.image_path).convert("RGB")
@@ -64,43 +62,54 @@ def main(opt):
             if not conv_text:
                 raise ValueError("empty conv")
 
-            # Create candidate descriptions - randomize order to avoid bias
-            import random
-            letters = list("ABCDEFGHIJKL")
-            random.shuffle(letters)  # Randomize order each time
+            # Try multiple approaches and average the results
+            all_scores = torch.zeros(12).to(device)  # For A-L
             
-            candidates = []
-            for letter in letters:
-                # Try different prompt styles
-                candidate = f"This describes tangram piece {letter}: {conv_text[:150]}"
-                candidates.append(candidate)
+            # Approach 1: Direct matching
+            candidates1 = []
+            for letter in "ABCDEFGHIJKL":
+                candidate = f"Tangram piece {letter} fits this description: {conv_text[:150]}"
+                candidates1.append(candidate)
             
-            # Process image and text
-            inputs = processor(
-                text=candidates,
-                images=grid_img,
-                return_tensors="pt",
-                padding=True
-            ).to(device)
-            
+            inputs1 = processor(text=candidates1, images=grid_img, return_tensors="pt", padding=True).to(device)
             with torch.no_grad():
-                outputs = model(**inputs)
-                logits_per_image = outputs.logits_per_image
-                probs = logits_per_image.softmax(dim=1)
-                
-                # Add temperature sampling to reduce bias
-                temperature = 2.0  # Higher temperature = more random
-                adjusted_logits = logits_per_image / temperature
-                adjusted_probs = adjusted_logits.softmax(dim=1)
-                
-                # Sample from the distribution instead of taking argmax
-                best_idx = torch.multinomial(adjusted_probs, 1).item()
-                pred_letter = letters[best_idx]  # Map back to original letter
-                confidence = probs[0, best_idx].item()
+                outputs1 = model(**inputs1)
+                scores1 = outputs1.logits_per_image.softmax(dim=1).squeeze()
+                all_scores += scores1
+            
+            # Approach 2: Question format
+            candidates2 = []
+            for letter in "ABCDEFGHIJKL":
+                candidate = f"Question: Which piece matches '{conv_text[:100]}'? Answer: Piece {letter} matches this description."
+                candidates2.append(candidate)
+            
+            inputs2 = processor(text=candidates2, images=grid_img, return_tensors="pt", padding=True).to(device)
+            with torch.no_grad():
+                outputs2 = model(**inputs2)
+                scores2 = outputs2.logits_per_image.softmax(dim=1).squeeze()
+                all_scores += scores2
+            
+            # Approach 3: Negative contrast
+            candidates3 = []
+            for letter in "ABCDEFGHIJKL":
+                candidate = f"The described tangram piece is specifically piece {letter}, not any other piece. Description: {conv_text[:100]}"
+                candidates3.append(candidate)
+            
+            inputs3 = processor(text=candidates3, images=grid_img, return_tensors="pt", padding=True).to(device)
+            with torch.no_grad():
+                outputs3 = model(**inputs3)
+                scores3 = outputs3.logits_per_image.softmax(dim=1).squeeze()
+                all_scores += scores3
+            
+            # Average the scores from all approaches
+            avg_scores = all_scores / 3.0
+            best_idx = avg_scores.argmax().item()
+            pred_letter = "ABCDEFGHIJKL"[best_idx]
+            confidence = avg_scores[best_idx].item()
 
             rows_out.append({
                 "trial_id": row["trial_id"],
-                "model_choice_raw": f"Letter {pred_letter} (confidence: {confidence:.3f})",
+                "model_choice_raw": f"Letter {pred_letter} (avg confidence: {confidence:.3f})",
                 "model_choice": pred_letter,
                 "target": row["target"],
                 "correct": pred_letter == row["target"],
@@ -111,6 +120,11 @@ def main(opt):
 
             if idx < 6:
                 print(f"\nTrial {idx} id={row['trial_id']}  tgt={row['target']}  pred={pred_letter} conf={confidence:.3f}")
+                # Show top 3 predictions for debugging
+                top3_indices = avg_scores.argsort(descending=True)[:3]
+                top3_letters = ["ABCDEFGHIJKL"[i] for i in top3_indices]
+                top3_scores = [avg_scores[i].item() for i in top3_indices]
+                print(f"  Top 3: {top3_letters[0]}({top3_scores[0]:.3f}), {top3_letters[1]}({top3_scores[1]:.3f}), {top3_letters[2]}({top3_scores[2]:.3f})")
 
         except Exception as err:
             print(f"trial {idx} (id={row.get('trial_id','?')}): {err}")
@@ -124,7 +138,7 @@ def main(opt):
             })
 
     # Save results
-    out_csv = f"model_choices-clip-{opt.experiment_name}-{opt.history_type}.csv"
+    out_csv = f"model_choices-clip-improved-{opt.experiment_name}-{opt.history_type}.csv"
     
     if not rows_out:
         print("No predictions were made!")
