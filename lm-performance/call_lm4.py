@@ -1,7 +1,8 @@
 import argparse, ast, warnings, re, pandas as pd, torch
 from PIL import Image
 from tqdm import tqdm
-from transformers import Blip2Processor, Blip2ForConditionalGeneration
+import open_clip
+import numpy as np
 
 warnings.filterwarnings("ignore", category=UserWarning)
 LETTER_RE = re.compile(r"\b([A-L])\b")
@@ -38,13 +39,9 @@ def extract_letter(text: str) -> str:
 def main(opt):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
-    # Load BLIP-2
-    processor = Blip2Processor.from_pretrained("Salesforce/blip2-opt-2.7b")
-    model = Blip2ForConditionalGeneration.from_pretrained(
-        "Salesforce/blip2-opt-2.7b",
-        torch_dtype=torch.float16,
-        device_map="auto"
-    ).eval()
+    # Load OpenCLIP (very stable)
+    model, _, preprocess = open_clip.create_model_and_transforms('ViT-B-32', pretrained='openai', device=device)
+    tokenizer = open_clip.get_tokenizer('ViT-B-32')
 
     df = pd.read_csv(opt.data_path)
     print(f"Original dataset has {len(df)} rows")
@@ -52,6 +49,9 @@ def main(opt):
     print(f"Testing with {len(df)} rows")
 
     grid_img = Image.open(opt.image_path).convert("RGB")
+    
+    # Preprocess the image once
+    image_tensor = preprocess(grid_img).unsqueeze(0).to(device)
 
     rows_out = []
     successful_predictions = 0
@@ -63,47 +63,45 @@ def main(opt):
             if not conv_text:
                 raise ValueError("empty conv")
 
-            # Create question for BLIP-2
-            question = (
-                f"Question: Look at the tangram pieces labeled A through L. "
-                f"Based on this conversation, which letter corresponds to the described shape? "
-                f"Answer with one letter only. Conversation: {conv_text[:500]} Answer:"
-            )
+            # Create candidate texts for each letter
+            candidates = []
+            for letter in "ABCDEFGHIJKL":
+                candidate = f"This image shows tangram shape {letter} which matches the description: {conv_text[:200]}"
+                candidates.append(candidate)
             
-            # Process with BLIP-2
-            inputs = processor(grid_img, question, return_tensors="pt").to(device)
+            # Tokenize all candidates
+            text_tokens = tokenizer(candidates).to(device)
             
             with torch.no_grad():
-                generated_ids = model.generate(
-                    **inputs,
-                    max_new_tokens=5,
-                    min_length=1,
-                    do_sample=False,  # Greedy decoding
-                    num_beams=1,
-                    early_stopping=True
-                )
-            
-            response = processor.decode(generated_ids[0], skip_special_tokens=True)
-            # BLIP-2 often includes the question in output, so extract just the answer
-            if "Answer:" in response:
-                response = response.split("Answer:")[-1].strip()
-            
-            pred_letter = extract_letter(response)
-            valid = pred_letter in "ABCDEFGHIJKL"
+                # Get image and text features
+                image_features = model.encode_image(image_tensor)
+                text_features = model.encode_text(text_tokens)
+                
+                # Normalize features
+                image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+                text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+                
+                # Calculate similarities
+                similarities = (image_features @ text_features.T).squeeze(0)
+                
+                # Get the letter with highest similarity
+                best_idx = similarities.argmax().item()
+                pred_letter = "ABCDEFGHIJKL"[best_idx]
+                confidence = similarities[best_idx].item()
 
             rows_out.append({
                 "trial_id": row["trial_id"],
-                "model_choice_raw": response.strip(),
+                "model_choice_raw": f"Letter {pred_letter} (confidence: {confidence:.3f})",
                 "model_choice": pred_letter,
                 "target": row["target"],
-                "correct": valid and pred_letter == row["target"],
-                "valid_format": valid
+                "correct": pred_letter == row["target"],
+                "valid_format": True  # Always valid since we choose from A-L
             })
 
             successful_predictions += 1
 
             if idx < 6:
-                print(f"\nTrial {idx} id={row['trial_id']}  tgt={row['target']}  raw='{response.strip()}'  → {pred_letter}")
+                print(f"\nTrial {idx} id={row['trial_id']}  tgt={row['target']}  pred={pred_letter} conf={confidence:.3f}")
 
         except Exception as err:
             print(f"trial {idx} (id={row.get('trial_id','?')}): {err}")
@@ -117,7 +115,7 @@ def main(opt):
             })
 
     # Save results
-    out_csv = f"model_choices-blip2-{opt.experiment_name}-{opt.history_type}.csv"
+    out_csv = f"model_choices-openclip-{opt.experiment_name}-{opt.history_type}.csv"
     
     if not rows_out:
         print("No predictions were made!")
