@@ -49,7 +49,7 @@ def main(opt):
 
     df = pd.read_csv(opt.data_path)
     print(f"Original dataset has {len(df)} rows")
-    df = df.head(50)
+    df = df.head(300)
     print(f"Testing with {len(df)} rows")
 
     grid_img = Image.open(opt.image_path).convert("RGB")
