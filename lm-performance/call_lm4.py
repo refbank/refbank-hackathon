@@ -1,8 +1,7 @@
 import argparse, ast, warnings, re, pandas as pd, torch
 from PIL import Image
 from tqdm import tqdm
-import open_clip
-import numpy as np
+from transformers import CLIPProcessor, CLIPModel
 
 warnings.filterwarnings("ignore", category=UserWarning)
 LETTER_RE = re.compile(r"\b([A-L])\b")
@@ -39,9 +38,14 @@ def extract_letter(text: str) -> str:
 def main(opt):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
-    # Load OpenCLIP (very stable)
-    model, _, preprocess = open_clip.create_model_and_transforms('ViT-B-32', pretrained='openai', device=device)
-    tokenizer = open_clip.get_tokenizer('ViT-B-32')
+    try:
+        # Try basic CLIP (should work with existing transformers)
+        processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+        model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(device)
+    except Exception as e:
+        print(f"Failed to load CLIP: {e}")
+        print("Try: pip cache purge && pip install transformers --upgrade")
+        return
 
     df = pd.read_csv(opt.data_path)
     print(f"Original dataset has {len(df)} rows")
@@ -49,9 +53,6 @@ def main(opt):
     print(f"Testing with {len(df)} rows")
 
     grid_img = Image.open(opt.image_path).convert("RGB")
-    
-    # Preprocess the image once
-    image_tensor = preprocess(grid_img).unsqueeze(0).to(device)
 
     rows_out = []
     successful_predictions = 0
@@ -63,31 +64,30 @@ def main(opt):
             if not conv_text:
                 raise ValueError("empty conv")
 
-            # Create candidate texts for each letter
+            # Create candidate descriptions for each letter with conversation context
             candidates = []
             for letter in "ABCDEFGHIJKL":
-                candidate = f"This image shows tangram shape {letter} which matches the description: {conv_text[:200]}"
+                # Include conversation context to make better distinctions
+                candidate = f"tangram shape {letter} described as: {conv_text[:100]}"
                 candidates.append(candidate)
             
-            # Tokenize all candidates
-            text_tokens = tokenizer(candidates).to(device)
+            # Process image and text
+            inputs = processor(
+                text=candidates,
+                images=grid_img,
+                return_tensors="pt",
+                padding=True
+            ).to(device)
             
             with torch.no_grad():
-                # Get image and text features
-                image_features = model.encode_image(image_tensor)
-                text_features = model.encode_text(text_tokens)
+                outputs = model(**inputs)
+                logits_per_image = outputs.logits_per_image
+                probs = logits_per_image.softmax(dim=1)
                 
-                # Normalize features
-                image_features = image_features / image_features.norm(dim=-1, keepdim=True)
-                text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-                
-                # Calculate similarities
-                similarities = (image_features @ text_features.T).squeeze(0)
-                
-                # Get the letter with highest similarity
-                best_idx = similarities.argmax().item()
+                # Get the letter with highest probability
+                best_idx = probs.argmax().item()
                 pred_letter = "ABCDEFGHIJKL"[best_idx]
-                confidence = similarities[best_idx].item()
+                confidence = probs.max().item()
 
             rows_out.append({
                 "trial_id": row["trial_id"],
@@ -95,7 +95,7 @@ def main(opt):
                 "model_choice": pred_letter,
                 "target": row["target"],
                 "correct": pred_letter == row["target"],
-                "valid_format": True  # Always valid since we choose from A-L
+                "valid_format": True
             })
 
             successful_predictions += 1
@@ -115,7 +115,7 @@ def main(opt):
             })
 
     # Save results
-    out_csv = f"model_choices-openclip-{opt.experiment_name}-{opt.history_type}.csv"
+    out_csv = f"model_choices-clip-{opt.experiment_name}-{opt.history_type}.csv"
     
     if not rows_out:
         print("No predictions were made!")
