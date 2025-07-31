@@ -64,11 +64,15 @@ def main(opt):
             if not conv_text:
                 raise ValueError("empty conv")
 
-            # Create candidate descriptions for each letter with conversation context
+            # Create candidate descriptions - randomize order to avoid bias
+            import random
+            letters = list("ABCDEFGHIJKL")
+            random.shuffle(letters)  # Randomize order each time
+            
             candidates = []
-            for letter in "ABCDEFGHIJKL":
-                # Include conversation context to make better distinctions
-                candidate = f"tangram shape {letter} described as: {conv_text[:100]}"
+            for letter in letters:
+                # Try different prompt styles
+                candidate = f"This describes tangram piece {letter}: {conv_text[:150]}"
                 candidates.append(candidate)
             
             # Process image and text
@@ -84,10 +88,15 @@ def main(opt):
                 logits_per_image = outputs.logits_per_image
                 probs = logits_per_image.softmax(dim=1)
                 
-                # Get the letter with highest probability
-                best_idx = probs.argmax().item()
-                pred_letter = "ABCDEFGHIJKL"[best_idx]
-                confidence = probs.max().item()
+                # Add temperature sampling to reduce bias
+                temperature = 2.0  # Higher temperature = more random
+                adjusted_logits = logits_per_image / temperature
+                adjusted_probs = adjusted_logits.softmax(dim=1)
+                
+                # Sample from the distribution instead of taking argmax
+                best_idx = torch.multinomial(adjusted_probs, 1).item()
+                pred_letter = letters[best_idx]  # Map back to original letter
+                confidence = probs[0, best_idx].item()
 
             rows_out.append({
                 "trial_id": row["trial_id"],
