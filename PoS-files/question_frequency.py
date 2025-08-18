@@ -4,44 +4,60 @@ import seaborn as sns
 import os
 import re
 
-# File paths
-message_path = "harmonized_data/hawkins2020_characterizing_cued/messages.csv"
-trial_path = "harmonized_data/hawkins2020_characterizing_cued/trials.csv"
-paper_name = os.path.basename(os.path.dirname(message_path))
+# All datasets
+dataset_paths = [
+    "harmonized_data/boyce2024_interaction",
+    "harmonized_data/eliav2023_semantic",
+    "harmonized_data/hawkins2019_continual",
+    "harmonized_data/hawkins2020_characterizing_cued",
+    "harmonized_data/hawkins2020_characterizing_uncued",
+    "harmonized_data/hawkins2021_respect",
+    "harmonized_data/hawkins2023_frompartners",
+    "harmonized_data/leung2024_scaffolding",
+    "harmonized_data/mankewitz2025_compositional"
+]
 
-# Load data
-messages_df = pd.read_csv(message_path)
-trials_df = pd.read_csv(trial_path)
-df = pd.merge(messages_df, trials_df[['trial_id', 'rep_num']], on='trial_id', how='left')
-df = df[df["role"] == "describer"].copy()
-
-# Question detection function 
-wh_words = {"what", "where", "who", "when", "why", "how", "which", "whose"}
-
-def is_question(text):
-    if pd.isna(text):
+# Question detection
+wh_words = {"what","where","who","when","why","how","which","whose"}
+def is_question(text: str) -> int:
+    if not isinstance(text, str):
         return 0
-    text = text.lower().strip()
-    # Ends with question mark
-    if text.endswith("?"):
+    t = text.lower().strip()
+    if t.endswith("?"):
         return 1
-    # Starts with a wh-word
-    first_word = re.split(r"\W+", text)[0]
-    if first_word in wh_words:
-        return 1
-    return 0
+    first = re.split(r"\W+", t)[0] if t else ""
+    return int(first in wh_words)
 
-df["is_question"] = df["text"].apply(is_question)
+# Build combined dataframe
+all_rows = []
+for dataset_path in dataset_paths:
+    msg_path = os.path.join(dataset_path, "messages.csv")
+    tri_path = os.path.join(dataset_path, "trials.csv")
+    dataset_name = os.path.basename(dataset_path)
 
-# Aggregate over rep_num
-question_by_rep = df.groupby("rep_num")["is_question"].mean().reset_index()
+    messages_df = pd.read_csv(msg_path)
+    trials_df   = pd.read_csv(tri_path)
 
-# Plot
-plt.figure(figsize=(10, 6))
-sns.lineplot(data=question_by_rep, x="rep_num", y="is_question", marker="o")
-plt.title(f"{paper_name}: Average Question Frequency Over Repetitions")
+    df = pd.merge(messages_df, trials_df[["trial_id","rep_num"]], on="trial_id", how="left")
+    df = df[df["role"] == "describer"].copy()
+    df["is_question"] = df["text"].apply(is_question)
+    df["dataset"] = dataset_name
+
+    all_rows.append(df[["rep_num","is_question","dataset"]])
+
+combined = pd.concat(all_rows, ignore_index=True)
+
+# Plot shaded 95% CI per dataset
+plt.figure(figsize=(12, 7))
+sns.lineplot(
+    data=combined,
+    x="rep_num", y="is_question",
+    hue="dataset", marker="o",
+    errorbar=("ci", 95)  # Seaborn automatically shades CI
+)
+plt.title("Question Frequency (proportion of describer messages) Over Repetitions")
 plt.xlabel("Repetition Number")
-plt.ylabel("Proportion of Describer Messages that Are Questions")
-plt.grid(True)
+plt.ylabel("Proportion of Questions")
+plt.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()

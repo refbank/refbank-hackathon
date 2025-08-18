@@ -4,46 +4,68 @@ import seaborn as sns
 import os
 import spacy
 
-# File paths 
-message_path = "harmonized_data/hawkins2020_characterizing_cued/messages.csv"
-trial_path = "harmonized_data/hawkins2020_characterizing_cued/trials.csv"
-paper_name = os.path.basename(os.path.dirname(message_path))
+dataset_paths = [
+    "harmonized_data/boyce2024_interaction",
+    "harmonized_data/eliav2023_semantic",
+    "harmonized_data/hawkins2019_continual",
+    "harmonized_data/hawkins2020_characterizing_cued",
+    "harmonized_data/hawkins2020_characterizing_uncued",
+    "harmonized_data/hawkins2021_respect",
+    "harmonized_data/hawkins2023_frompartners",
+    "harmonized_data/leung2024_scaffolding",
+    "harmonized_data/mankewitz2025_compositional"
+]
 
-# Load data 
-messages_df = pd.read_csv(message_path)
-trials_df = pd.read_csv(trial_path)
-df = pd.merge(messages_df, trials_df[['trial_id', 'rep_num']], on='trial_id', how='left')
-df = df[df["role"] == "describer"].copy()
-
-# Load spaCy 
 nlp = spacy.load("en_core_web_sm")
 
-# Count prepositions and words per message
-def count_preps_and_words(text):
-    if pd.isna(text) or not text.strip():
-        return pd.Series({"prep_count": 0, "word_count": 0})
-    doc = nlp(text)
-    prep_count = sum(1 for token in doc if token.dep_ == "prep")
-    word_count = sum(1 for token in doc if token.is_alpha)
-    return pd.Series({"prep_count": prep_count, "word_count": word_count})
+def preps_and_words_series(texts):
+    """Vectorized helper: parse a list of texts with nlp.pipe and return two lists:
+       prep_count and word_count per text."""
+    prep_counts, word_counts = [], []
+    for doc in nlp.pipe((t if isinstance(t, str) else "" for t in texts), batch_size=128):
+        prep_counts.append(sum(1 for tok in doc if tok.dep_ == "prep"))
+        word_counts.append(sum(1 for tok in doc if tok.is_alpha))
+    return prep_counts, word_counts
 
-df[["prep_count", "word_count"]] = df["text"].apply(count_preps_and_words)
+all_rows = []
 
-# Filter out empty messages
-df = df[df["word_count"] > 0].copy()
+for dataset_path in dataset_paths:
+    msg_path = os.path.join(dataset_path, "messages.csv")
+    tri_path = os.path.join(dataset_path, "trials.csv")
+    dataset_name = os.path.basename(dataset_path)
 
-# Normalize
-df["prep_rate"] = df["prep_count"] / df["word_count"]
+    # Load & merge
+    messages_df = pd.read_csv(msg_path)
+    trials_df   = pd.read_csv(tri_path)
+    df = pd.merge(messages_df, trials_df[['trial_id', 'rep_num']], on='trial_id', how='left')
+    df = df[df["role"] == "describer"].copy()
 
-# Aggregate over repetitions 
-prep_by_rep = df.groupby("rep_num")["prep_rate"].mean().reset_index()
+    # Count preps/words with spaCy (fast via pipe)
+    prep_counts, word_counts = preps_and_words_series(df["text"].tolist())
+    df["prep_count"] = prep_counts
+    df["word_count"] = word_counts
 
-# Plot
-plt.figure(figsize=(10, 6))
-sns.lineplot(data=prep_by_rep, x="rep_num", y="prep_rate", marker="o")
-plt.title(f"{paper_name}: Prepositional Phrase Rate per Word Over Repetitions")
+    # Drop empty messages and compute rate
+    df = df[df["word_count"] > 0].copy()
+    df["prep_rate"] = df["prep_count"] / df["word_count"]
+    df["dataset"] = dataset_name
+
+    all_rows.append(df[["rep_num", "prep_rate", "dataset"]])
+
+combined = pd.concat(all_rows, ignore_index=True)
+
+combined.to_csv("all_preposition_rates.csv", index=False)
+
+plt.figure(figsize=(12, 7))
+sns.lineplot(
+    data=combined,
+    x="rep_num", y="prep_rate",
+    hue="dataset", marker="o",
+    errorbar=("ci", 95)  # 95% bootstrapped CI
+)
+plt.title("Prepositional Phrase Rate (per word) Over Repetitions")
 plt.xlabel("Repetition Number")
-plt.ylabel("Avg. Prepositional Phrase Rate (per word)")
-plt.grid(True)
+plt.ylabel("Prepositions per Word")
+plt.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
