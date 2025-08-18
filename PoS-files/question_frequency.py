@@ -39,7 +39,6 @@ for dataset_path in dataset_paths:
     trials_df   = pd.read_csv(tri_path)
 
     df = pd.merge(messages_df, trials_df[["trial_id","rep_num"]], on="trial_id", how="left")
-    df = df[df["role"] == "describer"].copy()
     df["is_question"] = df["text"].apply(is_question)
     df["dataset"] = dataset_name
 
@@ -55,7 +54,7 @@ sns.lineplot(
     hue="dataset", marker="o",
     errorbar=("ci", 95)  # Seaborn automatically shades CI
 )
-plt.title("Question Frequency (proportion of describer messages) Over Repetitions")
+plt.title("Question Frequency Over Repetitions")
 plt.xlabel("Repetition Number")
 plt.ylabel("Proportion of Questions")
 plt.grid(True, alpha=0.3)
