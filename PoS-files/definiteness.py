@@ -10,8 +10,6 @@ nlp = spacy.load("en_core_web_sm")
 # File paths
 message_path = "harmonized_data/hawkins2020_characterizing_cued/messages.csv"
 trial_path = "harmonized_data/hawkins2020_characterizing_cued/trials.csv"
-
-# Extract paper name
 paper_name = os.path.basename(os.path.dirname(message_path))
 
 # Load data
@@ -19,10 +17,10 @@ messages_df = pd.read_csv(message_path)
 trials_df = pd.read_csv(trial_path)
 df = pd.merge(messages_df, trials_df[['trial_id', 'rep_num']], on='trial_id', how='left')
 
-# Filter to describer messages only
+# Filter to describer messages
 df = df[df["role"] == "describer"].copy()
 
-# Count articles and word count per message
+# Count articles and words
 def count_articles_and_words(text):
     if pd.isna(text):
         return pd.Series({"definite_count": 0, "indefinite_count": 0, "word_count": 0})
@@ -36,23 +34,28 @@ def count_articles_and_words(text):
         "word_count": words
     })
 
-# Apply the function
+# Apply
 df[["definite_count", "indefinite_count", "word_count"]] = df["text"].apply(count_articles_and_words)
-
-# Filter out messages with 0 words to avoid divide-by-zero
 df = df[df["word_count"] > 0].copy()
-
-# Normalize to get rates per word
 df["definite_rate"] = df["definite_count"] / df["word_count"]
 df["indefinite_rate"] = df["indefinite_count"] / df["word_count"]
 
-# Average rates by repetition
-article_by_rep = df.groupby("rep_num")[["definite_rate", "indefinite_rate"]].mean().reset_index()
+# Melt to long format so we can plot both lines in one call
+long_df = pd.melt(
+    df,
+    id_vars=["rep_num"],
+    value_vars=["definite_rate", "indefinite_rate"],
+    var_name="Article Type",
+    value_name="Rate"
+)
+long_df["Article Type"] = long_df["Article Type"].map({
+    "definite_rate": "‘the’ per word",
+    "indefinite_rate": "‘a/an’ per word"
+})
 
-# Plot
+# Plot with CI
 plt.figure(figsize=(10, 6))
-sns.lineplot(data=article_by_rep, x="rep_num", y="definite_rate", marker="o", label="‘the’ per word")
-sns.lineplot(data=article_by_rep, x="rep_num", y="indefinite_rate", marker="o", label="‘a/an’ per word")
+sns.lineplot(data=long_df, x="rep_num", y="Rate", hue="Article Type", ci=95, marker="o")
 
 plt.title(f"{paper_name}: Article Usage Rate per Word Over Repetitions")
 plt.xlabel("Repetition Number")

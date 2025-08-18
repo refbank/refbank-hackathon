@@ -18,7 +18,7 @@ trials_df = pd.read_csv(trial_path)
 df = pd.merge(messages_df, trials_df[['trial_id', 'rep_num']], on='trial_id', how='left')
 df = df[df["role"] == "describer"].copy()
 
-# Extract modifier/specificity features + word count
+# Extract features
 def extract_mod_features(text):
     if pd.isna(text):
         return {
@@ -29,7 +29,6 @@ def extract_mod_features(text):
             "num_preps": 0,
             "word_count": 0
         }
-    
     doc = nlp(text)
     adjectives = [t for t in doc if t.pos_ == "ADJ"]
     noun_chunks = list(doc.noun_chunks)
@@ -52,20 +51,17 @@ def extract_mod_features(text):
 mod_features = df["text"].apply(extract_mod_features).apply(pd.Series)
 df = pd.concat([df, mod_features], axis=1)
 
-# Drop any rows with 0 word count to avoid divide-by-zero
+# Filter for valid rows
 df = df[df["word_count"] > 0].copy()
 
-# Normalize counts by word count
+# Normalize
 df["adj_rate"] = df["num_adjectives"] / df["word_count"]
 df["np_rate"] = df["num_noun_chunks"] / df["word_count"]
 df["mod_rate"] = df["num_modifiers"] / df["word_count"]
 df["prep_rate"] = df["num_preps"] / df["word_count"]
-# avg_np_len is already a rate and doesn’t need normalization
+# avg_np_len is already a rate per noun phrase
 
-# Aggregate normalized features
-summary_df = df.groupby("rep_num")[["adj_rate", "np_rate", "avg_np_len", "mod_rate", "prep_rate"]].mean().reset_index()
-
-# Rename for readability
+# Melt long for plotting
 label_map = {
     "adj_rate": "Adjectives per word",
     "np_rate": "Noun phrases per word",
@@ -74,12 +70,19 @@ label_map = {
     "prep_rate": "Prepositional modifiers per word"
 }
 
-long_df = pd.melt(summary_df, id_vars="rep_num", var_name="Feature", value_name="Average")
+long_df = pd.melt(
+    df,
+    id_vars="rep_num",
+    value_vars=["adj_rate", "np_rate", "avg_np_len", "mod_rate", "prep_rate"],
+    var_name="Feature",
+    value_name="Value"
+)
 long_df["Feature"] = long_df["Feature"].map(label_map)
 
-# Plot
+# Plot with CI
 plt.figure(figsize=(12, 6))
-sns.lineplot(data=long_df, x="rep_num", y="Average", hue="Feature", marker="o")
+sns.lineplot(data=long_df, x="rep_num", y="Value", hue="Feature", ci=95, marker="o")
+
 plt.title(f"{paper_name}: Modifier & Specificity Feature Rates Over Repetitions")
 plt.xlabel("Repetition Number")
 plt.ylabel("Average Rate (per word)")
@@ -87,3 +90,4 @@ plt.grid(True)
 plt.tight_layout()
 plt.legend(title="Feature", loc="upper right")
 plt.show()
+
