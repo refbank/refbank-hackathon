@@ -87,7 +87,7 @@ for idx, row in df_edited.iterrows(): # Goes through each row
     final_lst = final.split()
 
     # Go through each word
-    # Dynamic programming: word is the upcoming word in original message, final_lst[idx_word_final] is upcoming word in final message
+    # 'word' is the upcoming word in original message, final_lst[idx_word_final] is upcoming word in final message
     # If these do not match, add "O" and move onto next word
     # If these do match, add B or I (depending on preceding label), and add 1 to idx_word_final
     for word in orig_lst:
