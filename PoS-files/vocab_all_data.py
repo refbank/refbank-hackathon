@@ -85,6 +85,11 @@ for dataset_path in dataset_paths:
         vocab_size_all = len(set(all_words))
         total_words_all = len(all_words)
 
+        repetition_ratio_all = (
+            total_words_all / vocab_size_all
+            if vocab_size_all > 0 else None
+        )
+        
         rows.append({
             "game_id": game_id,
             "rep_num": rep_num,
@@ -97,7 +102,8 @@ for dataset_path in dataset_paths:
 
             # New all-word measures
             "vocab_size_all": vocab_size_all,
-            "total_words_all": total_words_all
+            "total_words_all": total_words_all,
+            "repetition_ratio_all": repetition_ratio_all
         })
 
     game_df = pd.DataFrame(rows)
@@ -310,4 +316,22 @@ g.set_axis_labels("Repetition", "Value (relative to repetition 1)")
 g.set_titles("{col_name}")
 plt.subplots_adjust(top=0.9)
 g.figure.suptitle("Normalized Unique Words vs Total Words Across Datasets")
+plt.show()
+
+# Plot 9: Repetition ratio
+# total words / unique words
+plt.figure(figsize=(10, 6))
+sns.lineplot(
+    data=combined_df,
+    x="rep_num",
+    y="repetition_ratio_all",
+    hue="dataset",
+    marker="o",
+    errorbar=("ci", 95)
+)
+plt.title("Repetition Ratio (Total Words / Unique Words) Over Repetitions")
+plt.xlabel("Repetition")
+plt.ylabel("Total Words / Unique Words")
+plt.grid(True)
+plt.tight_layout()
 plt.show()
